@@ -1,4 +1,27 @@
 package dao;
 
+import entity.Producto;
+
+import java.sql.SQLException;
+import java.util.List;
+
 public interface ProductoDAO {
+
+    /**
+     * Inserta un nuevo producto en la base de datos.
+     * @param producto el objeto Producto a insertar.
+     */
+    void insert(Producto producto) throws SQLException;
+
+    /**
+     * Tarea 3: Devuelve el producto que más ha recaudado.
+     * @return un DTO con la información del producto y su recaudación total.
+     */
+    Producto getProductoConMayorRecaudacion() throws SQLException;
+
+    /**
+     * Obtiene todos los productos de la base de datos.
+     * @return una lista con todos los productos.
+     */
+    List<Producto> getAll() throws SQLException;
 }
