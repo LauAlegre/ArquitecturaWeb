@@ -4,7 +4,7 @@ import dao.ClienteDAO;
 import dao.FacturaDAO;
 import dao.FacturaProductoDAO;
 import dao.ProductoDAO;
-import repositori.mysql.MySQLDAOFactory;
+import repository.mysql.MySQLDAOFactory;
 
 public abstract class DAOFactory {
     public abstract ClienteDAO getClienteDAO();

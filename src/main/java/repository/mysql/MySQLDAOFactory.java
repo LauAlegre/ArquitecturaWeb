@@ -1,4 +1,4 @@
-package repositori.mysql;
+package repository.mysql;
 
 import dao.ClienteDAO;
 import dao.FacturaDAO;
@@ -14,16 +14,16 @@ public class MySQLDAOFactory extends DAOFactory {
 
     @Override
     public ProductoDAO getProductoDAO() {
-        return null;
+        return new MySQLproductoDAO();
     }
 
     @Override
     public FacturaDAO getFacturaDAO() {
-        return null;
+        return new MySQLfacturaDAO();
     }
 
     @Override
     public FacturaProductoDAO getFacturaProductoDAO() {
-        return null;
+        return new MySQLfacturaProductoDao();
     }
 }

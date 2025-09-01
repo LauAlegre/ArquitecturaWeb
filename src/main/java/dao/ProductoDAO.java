@@ -6,7 +6,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 public interface ProductoDAO {
-
+    void createTable() throws SQLException;
     /**
      * Inserta un nuevo producto en la base de datos.
      * @param producto el objeto Producto a insertar.
