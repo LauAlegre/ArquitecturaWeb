@@ -1,12 +1,21 @@
 package repository.mysql;
 import dao.FacturaProductoDAO;
+import entity.FacturaProducto;
 import factory.ConnectionManager;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 
 public class MySQLfacturaProductoDao implements FacturaProductoDAO {
+
+    private static Connection conn;
+
+    public MySQLfacturaProductoDao(Connection conn) {
+        this.conn = conn;
+    }
+
     @Override
     public void createTable() throws SQLException {
         String sql = "CREATE TABLE IF NOT EXISTS Factura_Producto (" +
@@ -26,7 +35,13 @@ public class MySQLfacturaProductoDao implements FacturaProductoDAO {
     }
 
     @Override
-    public void insert(entity.FacturaProducto facturaProducto) {
-
+    public void insert(FacturaProducto fp) throws SQLException {
+        String sql = "INSERT INTO factura_producto (idFactura, idProducto, cantidad) VALUES (?, ?, ?)";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, fp.getIdFactura());
+            ps.setInt(2, fp.getIdProducto());
+            ps.setInt(3, fp.getCantidad());
+            ps.executeUpdate();
+        }
     }
 }

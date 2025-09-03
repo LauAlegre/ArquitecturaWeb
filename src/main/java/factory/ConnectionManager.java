@@ -13,9 +13,9 @@ public class ConnectionManager {
     private Connection connection;
 
     // Constantes de conexión
-    private static final String URI = "jdbc:mysql://localhost:3306/practico"; // Reemplazar
-    private static final String USER = "lautaro"; // Reemplazar
-    private static final String PASS = "1234"; // Reemplazar
+    private static final String URI = "jdbc:mysql://localhost:3306/mysql-container"; // Reemplazar
+    private static final String USER = "root"; // Reemplazar
+    private static final String PASS = "12345"; // Reemplazar
 
     // 3. El constructor es PRIVADO. Solo se puede llamar desde esta misma clase.
     private ConnectionManager() {

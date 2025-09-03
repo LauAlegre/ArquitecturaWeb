@@ -6,6 +6,7 @@ package dao.SchemaGenerator;
 import dao.*;
 import factory.*;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 
 /**
@@ -14,9 +15,15 @@ import java.sql.SQLException;
  */
 public class SchemaGenerator {
 
+    private static Connection conn = null;
+
+    public SchemaGenerator(Connection conn) {
+        this.conn = conn;
+    }
+
     public static void createSchema() {
         // 1. Obtener la fábrica para la base de datos que vamos a usar (MySQL).
-        DAOFactory mySQLFactory = DAOFactory.getDAOFactory(DBType.MYSQL);
+        DAOFactory mySQLFactory = DAOFactory.getDAOFactory(DBType.MYSQL, conn);
 
         // 2. Obtener una instancia de cada DAO a través de la fábrica.
         ClienteDAO clienteDAO = mySQLFactory.getClienteDAO();

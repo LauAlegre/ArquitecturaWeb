@@ -5,10 +5,18 @@ import entity.Factura;
 import factory.ConnectionManager;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 
 public class MySQLfacturaDAO implements FacturaDAO {
+
+    private static Connection conn;
+
+    public MySQLfacturaDAO(Connection conn) {
+        this.conn = conn;
+    }
+
     @Override
     public void createTable() throws SQLException {
         String sql = "CREATE TABLE IF NOT EXISTS Factura (" +
@@ -24,7 +32,12 @@ public class MySQLfacturaDAO implements FacturaDAO {
         }
     }
     @Override
-    public int insert(Factura factura) throws SQLException {
-        return 0;
+    public void insert(Factura f) throws SQLException {
+        String sql = "INSERT INTO factura (idFactura, idCliente, fecha) VALUES (?, ?, ?)";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, f.getIdFactura());
+            ps.setInt(2, f.getIdCliente());
+            ps.executeUpdate();
+        }
     }
 }

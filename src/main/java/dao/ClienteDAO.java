@@ -1,6 +1,7 @@
 package dao;
 
 import entity.Cliente;
+import entity.ClienteFacturacion;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -15,7 +16,8 @@ public interface ClienteDAO {
 
     /**
      * Tarea 4: Devuelve una lista de clientes ordenada por el total de su facturación.
+     *
      * @return una lista de DTOs con la información del cliente y su facturación total.
      */
-    List<Cliente> getClientesOrdenadosPorFacturacion() throws SQLException;
+    List<ClienteFacturacion> getClientesOrdenadosPorFacturacion() throws SQLException;
 }
