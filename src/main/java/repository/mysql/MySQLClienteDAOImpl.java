@@ -1,4 +1,5 @@
 package repository.mysql;
+
 import dao.ClienteDAO;
 import entity.Cliente;
 import entity.ClienteFacturacion;
@@ -10,32 +11,25 @@ import java.util.List;
 
 public class MySQLClienteDAOImpl implements ClienteDAO {
 
+    private static MySQLClienteDAOImpl instance;
+    private Connection conn;
 
-    private static Connection conn;
-
-    public MySQLClienteDAOImpl(Connection conn) {
-        this.conn = conn;
+    private MySQLClienteDAOImpl() {
+        this.conn = ConnectionManager.getInstance().getConnection();
     }
 
-
-    @Override
-    public void createTable() throws SQLException {
-        String sql = "CREATE TABLE IF NOT EXISTS Cliente (" +
-                "idCliente INT PRIMARY KEY AUTO_INCREMENT, " +
-                "nombre VARCHAR(500) NOT NULL, " +
-                "email VARCHAR(150))";
-
-        // Obtenemos la conexión, pero NO la ponemos en el try-with-resources
-        Connection conn = ConnectionManager.getInstance().getConnection();
-        // Solo el Statement se autogestiona y cierra
-        try (Statement stmt = conn.createStatement()) {
-            stmt.executeUpdate(sql);
+    public static MySQLClienteDAOImpl getInstance() {
+        if (instance == null) {
+            instance = new MySQLClienteDAOImpl();
         }
+        return instance;
     }
+
+
 
     @Override
     public void insert(Cliente c) throws SQLException {
-        String sql = "INSERT INTO Cliente ( nombre, email) VALUES ( ?, ?)";
+        String sql = "INSERT INTO Cliente (nombre, email) VALUES (?, ?)";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, c.getNombre());
             ps.setString(2, c.getEmail());
@@ -46,14 +40,14 @@ public class MySQLClienteDAOImpl implements ClienteDAO {
     @Override
     public List<ClienteFacturacion> getClientesOrdenadosPorFacturacion() throws SQLException {
         String sql = """
-            SELECT c.idCliente, c.nombre, c.email,
-                   COALESCE(SUM(fp.cantidad * p.valor), 0) AS total
-            FROM cliente c
-            LEFT JOIN factura f           ON f.idCliente = c.idCliente
-            LEFT JOIN factura_producto fp ON fp.idFactura = f.idFactura
-            LEFT JOIN producto p          ON p.idProducto = fp.idProducto
-            GROUP BY c.idCliente, c.nombre, c.email
-            ORDER BY total DESC, c.idCliente ASC
+           SELECT c.idCliente, c.nombre, c.email,
+                              COALESCE(SUM(fp.cantidad * p.valor), 0) AS total
+                       FROM Cliente c
+                       LEFT JOIN Factura f           ON f.idCliente = c.idCliente
+                       LEFT JOIN Factura_Producto fp ON fp.idFactura = f.idFactura
+                       LEFT JOIN Producto p          ON p.idProducto = fp.idProducto
+                       GROUP BY c.idCliente, c.nombre, c.email
+                       ORDER BY total DESC, c.idCliente ASC
         """;
 
         List<ClienteFacturacion> out = new ArrayList<>();

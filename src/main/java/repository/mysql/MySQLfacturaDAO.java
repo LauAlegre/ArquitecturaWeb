@@ -11,26 +11,21 @@ import java.sql.Statement;
 
 public class MySQLfacturaDAO implements FacturaDAO {
 
-    private static Connection conn;
+    private static MySQLfacturaDAO instance;
+    private Connection conn;
 
-    public MySQLfacturaDAO(Connection conn) {
-        this.conn = conn;
+    private MySQLfacturaDAO() {
+        this.conn = ConnectionManager.getInstance().getConnection();
     }
 
-    @Override
-    public void createTable() throws SQLException {
-        String sql = "CREATE TABLE IF NOT EXISTS Factura (" +
-                "idFactura INT PRIMARY KEY AUTO_INCREMENT, " +
-                "idCliente INT NOT NULL, " +
-                "FOREIGN KEY (idCliente) REFERENCES Cliente(idCliente))";
-
-        // Obtenemos la conexión, pero NO la ponemos en el try-with-resources
-        Connection conn = ConnectionManager.getInstance().getConnection();
-        // Solo el Statement se cierra automáticamente
-        try (Statement stmt = conn.createStatement()) {
-            stmt.executeUpdate(sql);
+    public static MySQLfacturaDAO getInstance() {
+        if (instance == null) {
+            instance = new MySQLfacturaDAO();
         }
+        return instance;
     }
+
+
     @Override
     public void insert(Factura f) throws SQLException {
         String sql = "INSERT INTO Factura (idFactura, idCliente) VALUES (?, ?)";

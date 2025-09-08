@@ -7,7 +7,6 @@ import java.sql.SQLException;
 import java.util.List;
 
 public interface ClienteDAO {
-    void createTable() throws SQLException;
     /**
      * Inserta un nuevo cliente en la base de datos.
      * @param cliente el objeto Cliente a insertar.

@@ -2,6 +2,10 @@ package utils.SchemaGenerator;
 
 import dao.*;
 import factory.*;
+import utils.SchemaManager.SchemaManagerCliente;
+import utils.SchemaManager.SchemaManagerFactura;
+import utils.SchemaManager.SchemaManagerFacturaProducto;
+import utils.SchemaManager.SchemaManagerProducto;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -31,16 +35,16 @@ public class SchemaGenerator {
 
             // 3. Llamar a los métodos createTable() en el orden de dependencia.
             System.out.println("Creando tabla Cliente...");
-            clienteDAO.createTable();
+            SchemaManagerCliente.createTable(conn); // Usamos el SchemaManagerCliente para crear la tabla Cliente
 
             System.out.println("Creando tabla Producto...");
-            productoDAO.createTable();
+            SchemaManagerProducto.createTable(conn);
 
             System.out.println("Creando tabla Factura (depende de Cliente)...");
-            facturaDAO.createTable();
+            SchemaManagerFactura.createTable(conn); // Aseguramos que la tabla Cliente esté creada antes de Factura
 
             System.out.println("Creando tabla Factura_Producto (depende de Factura y Producto)...");
-            facturaProductoDAO.createTable();
+            SchemaManagerFacturaProducto.createTable(conn); // Aseguramos que la tabla Producto esté creada antes de Factura_Producto
 
             System.out.println("¡Esquema creado o verificado con éxito!");
 

@@ -1,4 +1,5 @@
 package repository.mysql;
+
 import dao.ProductoDAO;
 import entity.Producto;
 import entity.ProductoRecaudado;
@@ -6,31 +7,25 @@ import factory.ConnectionManager;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 public class MySQLproductoDAO implements ProductoDAO {
 
-    private  static Connection conn;
+    private static MySQLproductoDAO instance;
+    private Connection conn;
 
-    public MySQLproductoDAO(Connection conn) {
-        this.conn = conn;
+    private MySQLproductoDAO() {
+        this.conn = ConnectionManager.getInstance().getConnection();
     }
 
-    @Override
-    public void createTable() throws SQLException {
-        String sql = "CREATE TABLE IF NOT EXISTS Producto (" +
-                "idProducto INT PRIMARY KEY AUTO_INCREMENT, " +
-                "nombre VARCHAR(45) NOT NULL, " +
-                "valor FLOAT NOT NULL)";
-
-        // Obtenemos la conexión, pero NO la ponemos en el try-with-resources
-        Connection conn = ConnectionManager.getInstance().getConnection();
-        // Solo el Statement se autogestiona y cierra
-        try (Statement stmt = conn.createStatement()) {
-            stmt.executeUpdate(sql);
+    public static MySQLproductoDAO getInstance() {
+        if (instance == null) {
+            instance = new MySQLproductoDAO();
         }
+        return instance;
     }
+
+
 
     @Override
     public void insert(Producto p) throws SQLException {
@@ -38,7 +33,7 @@ public class MySQLproductoDAO implements ProductoDAO {
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, p.getIdProducto());
             ps.setString(2, p.getNombre());
-            ps.setFloat(3, p.getValor()); // mejor BigDecimal que float
+            ps.setFloat(3, p.getValor());
             ps.executeUpdate();
         }
     }
@@ -47,12 +42,12 @@ public class MySQLproductoDAO implements ProductoDAO {
     public ProductoRecaudado getProductoConMayorRecaudacion() throws SQLException {
         String sql = """
             SELECT p.idProducto, p.nombre,
-                   SUM(fp.cantidad * p.valor) AS recaudacion
-            FROM factura_producto fp
-            JOIN producto p ON p.idProducto = fp.idProducto
-            GROUP BY p.idProducto, p.nombre
-            ORDER BY recaudacion DESC
-            LIMIT 1
+                                      SUM(fp.cantidad * p.valor) AS recaudacion
+                               FROM Factura_Producto fp
+                               JOIN Producto p ON p.idProducto = fp.idProducto
+                               GROUP BY p.idProducto, p.nombre
+                               ORDER BY recaudacion DESC
+                               LIMIT 1
         """;
 
         try (PreparedStatement ps = conn.prepareStatement(sql);

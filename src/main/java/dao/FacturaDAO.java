@@ -5,7 +5,6 @@ import entity.Factura;
 import java.sql.SQLException;
 
 public interface FacturaDAO {
-    void createTable() throws SQLException;
     /**
      * Inserta una nueva factura en la base de datos.
      *

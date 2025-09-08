@@ -1,4 +1,5 @@
 package repository.mysql;
+
 import dao.FacturaProductoDAO;
 import entity.FacturaProducto;
 import factory.ConnectionManager;
@@ -10,29 +11,23 @@ import java.sql.Statement;
 
 public class MySQLfacturaProductoDao implements FacturaProductoDAO {
 
-    private static Connection conn;
+    private static MySQLfacturaProductoDao instance;
+    private Connection conn;
 
-    public MySQLfacturaProductoDao(Connection conn) {
-        this.conn = conn;
+    // Constructor privado para evitar instancias externas
+    private MySQLfacturaProductoDao() {
+        this.conn = ConnectionManager.getInstance().getConnection();
     }
 
-    @Override
-    public void createTable() throws SQLException {
-        String sql = "CREATE TABLE IF NOT EXISTS Factura_Producto (" +
-                "idFactura INT, " +
-                "idProducto INT, " +
-                "cantidad INT, " +
-                "PRIMARY KEY (idFactura, idProducto), " +
-                "FOREIGN KEY (idFactura) REFERENCES Factura(idFactura), " +
-                "FOREIGN KEY (idProducto) REFERENCES Producto(idProducto))";
-
-        // Obtenemos la conexión, pero NO la ponemos en el try-with-resources
-        Connection conn = ConnectionManager.getInstance().getConnection();
-        // Solo el Statement se cierra automáticamente
-        try (Statement stmt = conn.createStatement()) {
-            stmt.executeUpdate(sql);
+    // Método estático para obtener la instancia única (Singleton)
+    public static MySQLfacturaProductoDao getInstance() {
+        if (instance == null) {
+            instance = new MySQLfacturaProductoDao();
         }
+        return instance;
     }
+
+
 
     @Override
     public void insert(FacturaProducto fp) throws SQLException {
