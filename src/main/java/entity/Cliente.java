@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor // Genera el constructor vacío: new Cliente()
 @AllArgsConstructor // Genera el constructor con todos los campos
 public class Cliente {
-    private int idCliente;
     private String nombre;
     private String email;
 }

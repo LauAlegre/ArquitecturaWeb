@@ -1,16 +1,27 @@
-import dao.SchemaGenerator.SchemaGenerator;
+import utils.SchemaGenerator.SchemaGenerator;
+import utils.CSVImporter.CSVImporter;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
 
 public class Main {
-
     public static void main(String[] args) {
         System.out.println("Iniciando aplicación...");
 
-        // Tarea 1: Crear el esquema de la base de datos.
-        // Llamamos al método estático de nuestra clase de utilidad.
-        SchemaGenerator.createSchema();
+        String url = "jdbc:mysql://localhost:3306/practico";
+        String user = "lautaro";
+        String pass = "1234";
 
-        // Aquí irían las llamadas a las siguientes tareas, como cargar los datos
-        // y generar los reportes.
+        try (Connection conn = DriverManager.getConnection(url, user, pass)) {
+            // Crear esquema
+            SchemaGenerator.createSchema(conn);
+
+            // Importar CSV
+            CSVImporter.importarCSV(conn);
+        } catch (Exception e) {
+            System.err.println("❌ Error de conexión:");
+            e.printStackTrace();
+        }
 
         System.out.println("Proceso finalizado.");
     }

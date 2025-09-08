@@ -35,11 +35,10 @@ public class MySQLClienteDAOImpl implements ClienteDAO {
 
     @Override
     public void insert(Cliente c) throws SQLException {
-        String sql = "INSERT INTO cliente (idCliente, nombre, email) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO Cliente ( nombre, email) VALUES ( ?, ?)";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, c.getIdCliente());
-            ps.setString(2, c.getNombre());
-            ps.setString(3, c.getEmail());
+            ps.setString(1, c.getNombre());
+            ps.setString(2, c.getEmail());
             ps.executeUpdate();
         }
     }

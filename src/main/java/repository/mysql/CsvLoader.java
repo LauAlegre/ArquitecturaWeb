@@ -42,7 +42,6 @@ public class CsvLoader {
         try (CSVParser p = buildFormat().parse(new FileReader(path))) {
             for (CSVRecord r : p) {
                 Cliente c = new Cliente(
-                        Integer.parseInt(r.get("idCliente")),
                         r.get("nombre"),
                         r.get("email")
                 );

@@ -33,7 +33,7 @@ public class MySQLfacturaDAO implements FacturaDAO {
     }
     @Override
     public void insert(Factura f) throws SQLException {
-        String sql = "INSERT INTO factura (idFactura, idCliente, fecha) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO Factura (idFactura, idCliente) VALUES (?, ?)";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, f.getIdFactura());
             ps.setInt(2, f.getIdCliente());

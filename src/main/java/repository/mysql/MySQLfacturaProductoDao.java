@@ -36,7 +36,7 @@ public class MySQLfacturaProductoDao implements FacturaProductoDAO {
 
     @Override
     public void insert(FacturaProducto fp) throws SQLException {
-        String sql = "INSERT INTO factura_producto (idFactura, idProducto, cantidad) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO Factura_Producto (idFactura, idProducto, cantidad) VALUES (?, ?, ?)";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, fp.getIdFactura());
             ps.setInt(2, fp.getIdProducto());

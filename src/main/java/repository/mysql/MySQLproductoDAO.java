@@ -34,7 +34,7 @@ public class MySQLproductoDAO implements ProductoDAO {
 
     @Override
     public void insert(Producto p) throws SQLException {
-        String sql = "INSERT INTO producto (idProducto, nombre, valor) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO Producto (idProducto, nombre, valor) VALUES (?, ?, ?)";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, p.getIdProducto());
             ps.setString(2, p.getNombre());
