@@ -7,6 +7,7 @@ import org.entity.Inscripcion;
 import org.entity.InscripcionId;
 
 import javax.persistence.EntityManager;
+import java.sql.Connection;
 import java.time.LocalDate;
 import java.sql.Date;
 
@@ -14,7 +15,7 @@ public class MySqlIncripcionDAO implements InscripcionDAO {
 
     private final EntityManager em;
 
-    public MySqlIncripcionDAO(EntityManager em) {
+    public MySqlIncripcionDAO(Connection em) {
         this.em = em;
     }
 
@@ -40,4 +41,11 @@ public class MySqlIncripcionDAO implements InscripcionDAO {
 
         em.persist(inscripcion);
     }
-}
+
+    @Override
+    public void alta(Inscripcion inscripcion) {
+        em.getTransaction().begin();
+        em.persist(inscripcion);
+        em.getTransaction().commit();
+        }
+    }

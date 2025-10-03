@@ -5,6 +5,7 @@ import org.entity.Estudiante;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
+import java.sql.Connection;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,7 +13,7 @@ public class MySqlEstudianteDAO implements EstudianteDAO {
 
     private final EntityManager em;
 
-    public MySqlEstudianteDAO(EntityManager em) {
+    public MySqlEstudianteDAO(Connection em) {
         this.em = em;
     }
 
