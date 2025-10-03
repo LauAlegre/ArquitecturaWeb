@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CopilotDiffPersistence">
+    <option name="pendingDiffs">
+      <map>
+        <entry key="$PROJECT_DIR$/src/main/java/org/example/repository/CarreraRepository.java">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/src/main/java/org/example/repository/CarreraRepository.java" />
+              <option name="updatedContent" value="package org.example.repository;&#10;&#10;import org.example.Carrera;&#10;import org.springframework.data.jpa.repository.JpaRepository;&#10;&#10;public interface CarreraRepository extends JpaRepository&lt;Carrera, Integer&gt; {&#10;    // Métodos personalizados si es necesario&#10;}&#10;" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>
