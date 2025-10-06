@@ -1,33 +1,37 @@
 package org.Utils;
 
 import org.dao.*;
-import org.factory.*;
-import org.repository.MySQLDaoFactory;
+import javax.persistence.EntityManager;
 
-import java.sql.Connection;
-
+/**
+ * CSVImporter
+ * Clase utilitaria para importar todos los CSV de datos iniciales.
+ * Ahora recibe los DAO por parámetro, sin crearlos internamente.
+ */
 public class CSVImporter {
 
     private CSVImporter() {
-        // 🔒 Constructor privado para que no se instancie esta clase utilitaria
+        // 🔒 Evita instanciación
     }
 
-    public static void importarCSV(Connection conn) {
+    /**
+     * Ejecuta la importación de todos los CSV usando los DAO recibidos.
+     */
+    public static void importarCSV(
+            EntityManager conn,
+            EstudianteDAO estudianteDAO,
+            CarreraDAO carreraDAO,
+            InscripcionDAO inscripcionDAO
+    ) {
         try {
-            // Obtener DAOs desde la factory
-            DAOFactory factory = new MySQLDaoFactory(conn);
-            EstudianteDAO estudianteDAO = factory.getEstudianteDAO();
-            CarreraDAO carreraDAO = factory.getCarreraDAO();
-            InscripcionDAO inscripcionDAO = factory.getInscripcionDAO();
+            // Crear el loader con los DAO recibidos
+            CsvLoader loader = new CsvLoader(estudianteDAO, carreraDAO, inscripcionDAO, conn);
 
-            // Instanciar el CsvLoader
-            CsvLoader loader = new CsvLoader(estudianteDAO, carreraDAO, inscripcionDAO);
-
-            // Importar todos los archivos
+            // Ejecutar importación de los 3 CSV
             loader.importAll(
-                    "src/main/java/resources/estudiantes.csv",
-                    "src/main/java/resources/carreras.csv",
-                    "src/main/java/resources/inscripciones.csv"
+                    "src/main/resources/estudiantes.csv",
+                    "src/main/resources/carreras.csv",
+                    "src/main/resources/estudianteCarrera.csv"
             );
 
             System.out.println("✔ Importación CSV completada con éxito.");
@@ -35,6 +39,7 @@ public class CSVImporter {
         } catch (Exception e) {
             System.err.println("❌ Error al importar CSV:");
             e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 }

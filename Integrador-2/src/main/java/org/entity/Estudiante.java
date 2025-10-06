@@ -6,19 +6,17 @@ import java.util.List;
 @Entity
 public class Estudiante {
     @Id
-    private int numeroDeLibreta;
+    private int nroDocumento;
 
     @Column(name = "nombre", length = 50, nullable = false)
     private String nombre;
 
-    @Column(name = "fecha_nacimiento")
-    private Date fechaNacimiento;
-
-    @Column(name = "genero", length = 1)
+    @Column(name = "genero", length = 20)
     private String genero;
 
-    @Column(name = "nro_documento")
-    private Integer nroDocumento;
+    @Column(name = "nro_libreta_universitaria", unique = true, nullable = false)
+    private int numeroDeLibreta;
+
 
     @Column(name = "ciudad_residencia", length = 50)
     private String ciudadResidencia;
@@ -32,8 +30,6 @@ public class Estudiante {
     public String getNombre() { return nombre; }
     public void setNombre(String nombre) { this.nombre = nombre; }
 
-    public Date getFechaNacimiento() { return fechaNacimiento; }
-    public void setFechaNacimiento(Date fechaNacimiento) { this.fechaNacimiento = fechaNacimiento; }
 
     public String getGenero() { return genero; }
     public void setGenero(String genero) { this.genero = genero; }
@@ -43,5 +39,9 @@ public class Estudiante {
 
     public String getCiudadResidencia() { return ciudadResidencia; }
     public void setCiudadResidencia(String ciudadResidencia) { this.ciudadResidencia = ciudadResidencia; }
+    public int getNumeroDeLibreta() { return numeroDeLibreta; }
+
+    public void setNroLibretaUniversitaria(int numeroDeLibreta) { this.numeroDeLibreta = numeroDeLibreta; }
+    public int getNroLibretaUniversitaria() { return this.numeroDeLibreta; }
 
 }

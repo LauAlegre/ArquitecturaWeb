@@ -13,14 +13,15 @@ public class InscripcionId implements Serializable {
         return idEstudiante;
     }
 
-    public void setIdEstudiante(Integer idEstudiante) {
+    public void setIdEstudiante(int idEstudiante) {
         this.idEstudiante = idEstudiante;
     }
     public int getIdCarrera() {
         return idCarrera;
     }
-    public void setIdCarrera(Integer idCarrera) {
+    public void setIdCarrera(int idCarrera) {
         this.idCarrera = idCarrera;
     }
 }
+
 

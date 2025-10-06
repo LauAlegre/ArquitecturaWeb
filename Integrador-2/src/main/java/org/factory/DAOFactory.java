@@ -1,15 +1,35 @@
 package org.factory;
 
-import org.dao.*;
+import org.dao.CarreraDAO;
+import org.dao.EstudianteDAO;
+import org.dao.InscripcionDAO;
+import org.repository.CarreraRepository;
+import org.repository.EstudianteRepository;
+import org.repository.InscripcionRepository;
 
-public abstract class DAOFactory {
 
-    public abstract EstudianteDAO getEstudianteDAO();
+import javax.persistence.EntityManager;
 
-    public abstract CarreraDAO getCarreraDAO();
+public class DAOFactory {
 
-    public abstract InscripcionDAO getInscripcionDAO();
+    private final EntityManager conn;
 
-    // ...puedes agregar otros DAOs si el proyecto lo requiere...
+    public DAOFactory(EntityManager conn) {
+        this.conn = conn;
+    }
+
+
+    public EstudianteDAO getEstudianteDAO() {
+        return  EstudianteRepository.getInstance(conn);
+    }
+
+
+    public CarreraDAO getCarreraDAO() {
+        return  CarreraRepository.getInstance(conn);
+    }
+
+
+    public InscripcionDAO getInscripcionDAO() {
+        return  InscripcionRepository.getInstance(conn);
+    }
 }
-
