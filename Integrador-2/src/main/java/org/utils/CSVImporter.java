@@ -1,4 +1,4 @@
-package org.Utils;
+package org.utils;
 
 import org.dao.*;
 import javax.persistence.EntityManager;

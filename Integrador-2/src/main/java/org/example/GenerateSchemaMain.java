@@ -1,6 +1,6 @@
 package org.example;
 
-import org.Utils.CSVImporter;
+import org.utils.CSVImporter;
 import org.dao.CarreraDAO;
 import org.dao.EstudianteDAO;
 import org.dao.InscripcionDAO;
