@@ -1,9 +1,9 @@
 package org.example;
 
 import org.utils.CSVImporter;
-import org.dao.CarreraDAO;
-import org.dao.EstudianteDAO;
-import org.dao.InscripcionDAO;
+import org.repository.CarreraRepository;
+import org.repository.EstudianteRepository;
+import org.repository.InscripcionRepository;
 import org.factory.DAOFactory;
 import org.dto.EstudianteDTO;
 import org.dto.CarreraDTO; // <-- agregado
@@ -22,37 +22,37 @@ public class GenerateSchemaMain {
         try {
             // 🔹 Crear la factory y los DAO
             DAOFactory factory = new DAOFactory(em);
-            EstudianteDAO estudianteDAO = factory.getEstudianteDAO();
-            CarreraDAO carreraDAO = factory.getCarreraDAO();
-            InscripcionDAO inscripcionDAO = factory.getInscripcionDAO();
+            EstudianteRepository estudianteRepository = factory.getEstudianteDAO();
+            CarreraRepository carreraRepository = factory.getCarreraDAO();
+            InscripcionRepository inscripcionRepository = factory.getInscripcionDAO();
 
             // 🔹 Importar los CSV
-            CSVImporter.importarCSV(em, estudianteDAO, carreraDAO, inscripcionDAO);
+            CSVImporter.importarCSV(em, estudianteRepository, carreraRepository, inscripcionRepository);
             System.out.println("\n✅ Esquema generado y datos cargados desde CSV.");
 
             System.out.println("\n--- 🎓 Estudiantes ordenados por nombre ASC ---");
-            List<EstudianteDTO> estudiantesOrdenados = estudianteDAO.findAllOrderByNombreAsc();
+            List<EstudianteDTO> estudiantesOrdenados = estudianteRepository.findAllOrderByNombreAsc();
             estudiantesOrdenados.forEach(System.out::println);
 
             System.out.println("\n--- 🔍 Buscar estudiante por Nro de Libreta (ej: 1) ---");
-            EstudianteDTO porLibreta = estudianteDAO.findByNroLibreta(56695);
+            EstudianteDTO porLibreta = estudianteRepository.findByNroLibreta(56695);
             System.out.println(porLibreta != null ? porLibreta : "⚠ No se encontró estudiante con LU=1");
 
             System.out.println("\n--- 🚻 Estudiantes por género (ej: 'F') ---");
-            List<EstudianteDTO> porGenero = estudianteDAO.findByGenero("Male");
+            List<EstudianteDTO> porGenero = estudianteRepository.findByGenero("Male");
             porGenero.forEach(System.out::println);
 
-            System.out.println("\n--- 🏫 Estudiantes de carrera=1 en ciudad='Paquera' ---");
-            List<EstudianteDTO> porCarreraCiudad = estudianteDAO.findByCarreraAndCiudad(1, "Paquera");
+            System.out.println("\n--- 🏫 Estudiantes de carrera=1 en ciudad='Rauch' ---");
+            List<EstudianteDTO> porCarreraCiudad = estudianteRepository.findByCarreraAndCiudad(1, "Rauch");
             porCarreraCiudad.forEach(System.out::println);
 
             // ==== Carreras con inscriptos (orden desc por cantidad) ====
             System.out.println("\n--- 📊 Carreras con inscriptos (desc por cantidad) ---");
-            List<CarreraDTO> carrerasConInscriptos = carreraDAO.findCarrerasConInscriptosOrdenadasPorCantidadDesc();
+            List<CarreraDTO> carrerasConInscriptos = carreraRepository.findCarrerasConInscriptosOrdenadasPorCantidadDesc();
             carrerasConInscriptos.forEach(System.out::println);
 
             // 🔹 Obtener el reporte de carreras con inscriptos y egresados por año
-            List<Object[]> reporte = inscripcionDAO.getReporteCarrerasPorAnio();
+            List<Object[]> reporte = inscripcionRepository.getReporteCarrerasPorAnio();
 
             // 🔹 Mostrar el reporte formateado
             String carreraActual = "";

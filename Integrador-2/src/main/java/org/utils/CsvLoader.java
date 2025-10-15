@@ -1,6 +1,9 @@
 package org.utils;
 
-import org.dao.*;
+import org.repository.CarreraRepository;
+import org.repository.EstudianteRepository;
+import org.repository.InscripcionRepository;
+
 import javax.persistence.EntityManager;
 import java.io.*;
 
@@ -11,15 +14,15 @@ import java.io.*;
  */
 public class CsvLoader {
 
-    private final EstudianteDAO estudianteDAO;
-    private final CarreraDAO carreraDAO;
-    private final InscripcionDAO inscripcionDAO;
+    private final EstudianteRepository estudianteRepository;
+    private final CarreraRepository carreraRepository;
+    private final InscripcionRepository inscripcionRepository;
     private final EntityManager em;
 
-    public CsvLoader(EstudianteDAO estudianteDAO, CarreraDAO carreraDAO, InscripcionDAO inscripcionDAO, EntityManager em) {
-        this.estudianteDAO = estudianteDAO;
-        this.carreraDAO = carreraDAO;
-        this.inscripcionDAO = inscripcionDAO;
+    public CsvLoader(EstudianteRepository estudianteRepository, CarreraRepository carreraRepository, InscripcionRepository inscripcionRepository, EntityManager em) {
+        this.estudianteRepository = estudianteRepository;
+        this.carreraRepository = carreraRepository;
+        this.inscripcionRepository = inscripcionRepository;
         this.em = em;
     }
 
@@ -59,7 +62,7 @@ public class CsvLoader {
                     int nroLibreta = Integer.parseInt(campos[6].trim());
                     System.out.println("Importando estudiante LU " + nroLibreta + ": " + nombre + " " + apellido);
 
-                    estudianteDAO.cargarEstudiante(nroLibreta, nombre, apellido, genero, ciudad, dni);
+                    estudianteRepository.cargarEstudiante(nroLibreta, nombre, apellido, genero, ciudad, dni);
                     count++;
 
                 } catch (Exception e) {
@@ -96,7 +99,7 @@ public class CsvLoader {
                     String nombre = campos[1].trim();
                     int duracion = Integer.parseInt(campos[2].trim());
 
-                    carreraDAO.cargarCarrera(idCarrera, nombre, duracion);
+                    carreraRepository.cargarCarrera(idCarrera, nombre, duracion);
                     count++;
 
                 } catch (Exception e) {
@@ -136,16 +139,16 @@ public class CsvLoader {
                     int fechaGraduacion = parseIntSafe(campos[4]);
                     int antiguedad = parseIntSafe(campos[5]);
 
-                    if (estudianteDAO.findById(nroDocumento) == null) {
+                    if (estudianteRepository.findById(nroDocumento) == null) {
                         System.err.println("⚠ Estudiante no encontrado (DOC " + nroDocumento + ")");
                         continue;
                     }
-                    if (carreraDAO.getCarreraById(idCarrera) == null) {
+                    if (carreraRepository.getCarreraById(idCarrera) == null) {
                         System.err.println("⚠ Carrera no encontrada (ID " + idCarrera + ")");
                         continue;
                     }
 
-                    inscripcionDAO.matricular(nroDocumento, idCarrera, fechaInscripcion, fechaGraduacion, antiguedad);
+                    inscripcionRepository.matricular(nroDocumento, idCarrera, fechaInscripcion, fechaGraduacion, antiguedad);
                     count++;
 
                 } catch (Exception e) {

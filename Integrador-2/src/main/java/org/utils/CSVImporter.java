@@ -1,6 +1,9 @@
 package org.utils;
 
-import org.dao.*;
+import org.repository.CarreraRepository;
+import org.repository.EstudianteRepository;
+import org.repository.InscripcionRepository;
+
 import javax.persistence.EntityManager;
 
 /**
@@ -19,13 +22,13 @@ public class CSVImporter {
      */
     public static void importarCSV(
             EntityManager conn,
-            EstudianteDAO estudianteDAO,
-            CarreraDAO carreraDAO,
-            InscripcionDAO inscripcionDAO
+            EstudianteRepository estudianteRepository,
+            CarreraRepository carreraRepository,
+            InscripcionRepository inscripcionRepository
     ) {
         try {
             // Crear el loader con los DAO recibidos
-            CsvLoader loader = new CsvLoader(estudianteDAO, carreraDAO, inscripcionDAO, conn);
+            CsvLoader loader = new CsvLoader(estudianteRepository, carreraRepository, inscripcionRepository, conn);
 
             // Ejecutar importación de los 3 CSV
             loader.importAll(
