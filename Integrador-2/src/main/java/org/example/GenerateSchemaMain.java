@@ -4,7 +4,7 @@ import org.utils.CSVImporter;
 import org.repository.CarreraRepository;
 import org.repository.EstudianteRepository;
 import org.repository.InscripcionRepository;
-import org.factory.DAOFactory;
+import org.factory.Factory;
 import org.dto.EstudianteDTO;
 import org.dto.CarreraDTO; // <-- agregado
 
@@ -21,10 +21,10 @@ public class GenerateSchemaMain {
 
         try {
             // 🔹 Crear la factory y los DAO
-            DAOFactory factory = new DAOFactory(em);
-            EstudianteRepository estudianteRepository = factory.getEstudianteDAO();
-            CarreraRepository carreraRepository = factory.getCarreraDAO();
-            InscripcionRepository inscripcionRepository = factory.getInscripcionDAO();
+            Factory factory = new Factory(em);
+            EstudianteRepository estudianteRepository = factory.getEstudianteRepositoryImpl();
+            CarreraRepository carreraRepository = factory.getCarreraRepositoryImpl();
+            InscripcionRepository inscripcionRepository = factory.getInscripcionRepositoryImpl();
 
             // 🔹 Importar los CSV
             CSVImporter.importarCSV(em, estudianteRepository, carreraRepository, inscripcionRepository);

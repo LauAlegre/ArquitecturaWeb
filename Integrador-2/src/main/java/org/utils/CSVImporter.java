@@ -9,7 +9,7 @@ import javax.persistence.EntityManager;
 /**
  * CSVImporter
  * Clase utilitaria para importar todos los CSV de datos iniciales.
- * Ahora recibe los DAO por parámetro, sin crearlos internamente.
+
  */
 public class CSVImporter {
 
@@ -17,9 +17,7 @@ public class CSVImporter {
         // 🔒 Evita instanciación
     }
 
-    /**
-     * Ejecuta la importación de todos los CSV usando los DAO recibidos.
-     */
+
     public static void importarCSV(
             EntityManager conn,
             EstudianteRepository estudianteRepository,
@@ -27,7 +25,7 @@ public class CSVImporter {
             InscripcionRepository inscripcionRepository
     ) {
         try {
-            // Crear el loader con los DAO recibidos
+
             CsvLoader loader = new CsvLoader(estudianteRepository, carreraRepository, inscripcionRepository, conn);
 
             // Ejecutar importación de los 3 CSV

@@ -10,7 +10,7 @@ import java.io.*;
 /**
  * CsvLoader
  * Carga estudiantes, carreras e inscripciones (ignorando el primer campo del CSV de inscripciones).
- * Totalmente compatible con MySqlEstudianteDAO, MySqlCarreraDAO, MySqlIncripcionDAO.
+ *
  */
 public class CsvLoader {
 

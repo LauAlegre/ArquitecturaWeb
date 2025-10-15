@@ -10,26 +10,26 @@ import org.repository.InscripcionRepositoryImpl;
 
 import javax.persistence.EntityManager;
 
-public class DAOFactory {
+public class Factory {
 
     private final EntityManager conn;
 
-    public DAOFactory(EntityManager conn) {
+    public Factory(EntityManager conn) {
         this.conn = conn;
     }
 
 
-    public EstudianteRepository getEstudianteDAO() {
+    public EstudianteRepository getEstudianteRepositoryImpl() {
         return  EstudianteRepositoryImpl.getInstance(conn);
     }
 
 
-    public CarreraRepository getCarreraDAO() {
+    public CarreraRepository getCarreraRepositoryImpl() {
         return  CarreraRepositoryImpl.getInstance(conn);
     }
 
 
-    public InscripcionRepository getInscripcionDAO() {
+    public InscripcionRepository getInscripcionRepositoryImpl() {
         return  InscripcionRepositoryImpl.getInstance(conn);
     }
 }
