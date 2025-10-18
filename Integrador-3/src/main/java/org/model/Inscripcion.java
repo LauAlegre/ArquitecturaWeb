@@ -1,10 +1,9 @@
 package org.model;
 import jakarta.persistence.*;
-import java.io.Serializable;
-import org.model.InscripcionId;
+import lombok.Data;
 
 
-
+@Data
 @Entity
 public class Inscripcion {
     @EmbeddedId
@@ -34,23 +33,8 @@ public class Inscripcion {
 
     private Carrera carrera;
 
-    // Getters y setters
 
 
-    public InscripcionId getId() { return id; }
-    public void setId(InscripcionId id) { this.id = id; }
 
-    public int getFechaInscripcion() { return fechaInscripcion; }
-    public void setFechaInscripcion(int fechaInscripcion) { this.fechaInscripcion = fechaInscripcion; }
 
-    public int getFechaGraduado() { return fechaGraduado; }
-    public void setFechaGraduado(int fechaGraduado) { this.fechaGraduado = fechaGraduado; }
-
-    public Estudiante getEstudiante() { return estudiante; }
-    public void setEstudiante(Estudiante estudiante) { this.estudiante = estudiante; }
-
-    public Carrera getCarrera() { return carrera; }
-    public void setCarrera(Carrera carrera) { this.carrera = carrera; }
-    public int getAntiguedad() { return antiguedad; }
-    public void setAntiguedad(int antiguedad) { this.antiguedad = antiguedad; }
 }

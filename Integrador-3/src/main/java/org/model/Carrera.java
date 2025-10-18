@@ -1,29 +1,24 @@
 package org.model;
 import jakarta.persistence.*;
+import lombok.Data;
+
 import java.util.List;
 
-
+@Data
 @Entity
 public class Carrera {
     @Id
-    private int id_carrera;
+    private Long id_carrera;
     @Column
     private String nombre;
     @Column
     private int duracion_anios;
-    @OneToMany (mappedBy = "carrera", fetch = javax.persistence.FetchType.LAZY)
+    @OneToMany(mappedBy = "carrera", fetch = FetchType.LAZY)
     private List<Inscripcion> inscripciones;
 
-    // Getters y Setters
-    public int getId_carrera() { return id_carrera; }
-    public void setId_carrera(int id_carrera) { this.id_carrera = id_carrera; }
+    public void setId(Long id_carrera) {
+        this.id_carrera = id_carrera;
+    }
 
-    public String getNombre() { return nombre; }
-    public void setNombre(String nombre) { this.nombre = nombre; }
 
-    public int getDuracion_anios() { return duracion_anios; }
-    public void setDuracion_anios(int duracion_anios) { this.duracion_anios = duracion_anios; }
-
-    public List<Inscripcion> getInscripciones() { return inscripciones; }
-    public void setInscripciones(List<Inscripcion> inscripciones) { this.inscripciones = inscripciones; }
 }

@@ -1,27 +1,20 @@
 
 package org.model;
 import jakarta.persistence.*;
-import java.io.Serializable;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Embeddable
 public class InscripcionId implements Serializable {
-    private int idEstudiante;
-    private int idCarrera;
+    private Long idEstudiante;
+    private Long idCarrera;
 
-    // Getters y setters
-    public int getIdEstudiante() {
-        return idEstudiante;
-    }
 
-    public void setIdEstudiante(int idEstudiante) {
-        this.idEstudiante = idEstudiante;
-    }
-    public int getIdCarrera() {
-        return idCarrera;
-    }
-    public void setIdCarrera(int idCarrera) {
-        this.idCarrera = idCarrera;
-    }
 }
 
 

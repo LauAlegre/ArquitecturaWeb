@@ -9,9 +9,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CarreraDTO {
-    private Long idCarrera;
-    private String nombre;
-    private int duracionAnios;
-    private long cantidadInscriptos;
+public class CarreraReporteDTO {
+    private String nombreCarrera;
+    private int anio;
+    private long inscriptos;
+    private long egresados;
 }

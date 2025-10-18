@@ -2,8 +2,20 @@ package com.example.demo;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = {
+    "com.example.demo",
+    "org.controller",
+    "org.dto",
+    "org.mapper",
+    "org.model",
+    "org.repository",
+    "org.service"
+})
+@EnableJpaRepositories(basePackages = "org.repository")
+@EntityScan(basePackages = "org.model")
 public class DemoApplication {
 
     public static void main(String[] args) {
