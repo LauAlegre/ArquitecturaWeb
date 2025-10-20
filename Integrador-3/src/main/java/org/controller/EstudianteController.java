@@ -17,19 +17,11 @@ public class  EstudianteController {
         this.service = estudianteService;
     }
 
+    // a) Dar de alta un nuevo estudiante
     @PostMapping("/crear")
-    public List<EstudianteDTO> crearEstudiantes(@RequestBody List<EstudianteDTO> estudiantes) {
-        return estudiantes.stream()
-                .map(service::crearEstudiante)
-                .toList();
+    public EstudianteDTO crearEstudiante(@RequestBody EstudianteDTO dto) {
+        return service.crearEstudiante(dto);
     }
-
-    //Dejo comentado el metodo para crear un solo estudiante en caso de ser necesario
-
-//    @PostMapping("/crear")
-//    public EstudianteDTO crearEstudiante(@RequestBody EstudianteDTO dto) {
-//        return service.crearEstudiante(dto);
-//    }
 
 
 

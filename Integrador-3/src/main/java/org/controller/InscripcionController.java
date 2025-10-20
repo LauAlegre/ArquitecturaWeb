@@ -20,21 +20,12 @@ public class InscripcionController {
     }
 
     // b) Matricular un estudiante en una carrera
+
     @PostMapping("/matricular")
-    public List<InscripcionDTO> crearVarias(@RequestBody List<InscripcionDTO> requests) {
-        return requests.stream()
-                .map(req -> service.crearInscripcion(req))
-                .toList();
+    public InscripcionDTO crearInscripcion(@RequestBody InscripcionDTO inscripcionDTO)
+    {
+        return service.crearInscripcion(inscripcionDTO);
     }
-
-    // Dejo comentado el metodo para crear una sola inscripcion en caso de ser necesario
-
-
-//    @PostMapping("/matricular")
-//    public InscripcionDTO crearInscripcion(@RequestBody InscripcionDTO inscripcionDTO)
-//    {
-//        return service.crearInscripcion(inscripcionDTO);
-//    }
 
     // h) Generar un reporte anual de carreras con cantidad de inscriptos y egresados
     @GetMapping("/reporte")

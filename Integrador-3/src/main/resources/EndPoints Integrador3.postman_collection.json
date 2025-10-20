@@ -1,0 +1,214 @@
+{
+	"info": {
+		"_postman_id": "8411b245-cf7f-4824-944f-2b14556da852",
+		"name": "EndPoints Integrador3",
+		"description": "### Welcome to Postman! This is your first collection. \n\nCollections are your starting point for building and testing APIs. You can use this one to:\n\n• Group related requests\n• Test your API in real-world scenarios\n• Document and share your requests\n\nUpdate the name and overview whenever you’re ready to make it yours.\n\n[Learn more about Postman Collections.](https://learning.postman.com/docs/collections/collections-overview/)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "49156834",
+		"_collection_link": "https://lalegrezelione-1042574.postman.co/workspace/LAUTARO-ALEJO-ALEGRE-ZELIONE's-~d8dc0778-ec9d-4b95-813d-4a26ce6faa59/collection/49156834-8411b245-cf7f-4824-944f-2b14556da852?action=share&source=collection_link&creator=49156834"
+	},
+	"item": [
+		{
+			"name": "Estudiantes",
+			"item": [
+				{
+					"name": "DarDeAltaEstudiante",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/estudiante/crear",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"estudiante",
+								"crear"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "OrdenadoPorApellido",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/estudiante/ordenados-por-apellido",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"estudiante",
+								"ordenados-por-apellido"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "BuscarPorNroLibreta",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/estudiante/12345",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"estudiante",
+								"12345"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "BuscarPorGenero",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/estudiante/por-genero?genero=F",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"estudiante",
+								"por-genero"
+							],
+							"query": [
+								{
+									"key": "genero",
+									"value": "F"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "BuscarPorCiudadCarrera",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Carreras",
+			"item": [
+				{
+					"name": "InscriptosOrdenados",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/carrera/inscriptos-ordenados",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"carrera",
+								"inscriptos-ordenados"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CrearCarrera",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/carrera/crear",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"carrera",
+								"crear"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Reportes",
+			"item": [
+				{
+					"name": "Reporte",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/inscripcion/reporte",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"inscripcion",
+								"reporte"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Inscripcion",
+			"item": [
+				{
+					"name": "Matricular",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/inscripcion/matricular",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"inscripcion",
+								"matricular"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
