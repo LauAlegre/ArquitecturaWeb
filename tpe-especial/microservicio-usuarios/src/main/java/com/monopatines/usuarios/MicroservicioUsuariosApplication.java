@@ -1,4 +1,4 @@
-package org.example.microserviciousuarios;
+package com.monopatines.usuarios;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
