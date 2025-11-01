@@ -24,11 +24,6 @@ public class Estudiante {
     @Column(name = "ciudad_residencia", length = 50)
     private String ciudadResidencia;
 
-    @OneToMany(mappedBy = "estudiante", fetch = FetchType.LAZY)
-
+    @OneToMany(mappedBy = "estudiante")
     private List<Inscripcion> inscripciones;
-
-
-
-
 }
