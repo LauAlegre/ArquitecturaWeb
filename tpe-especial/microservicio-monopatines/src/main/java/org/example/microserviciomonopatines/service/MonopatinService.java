@@ -16,6 +16,10 @@ public interface MonopatinService {
 
     void eliminar(Long id);
 
+    MonopatinDTO darDeBaja(Long id);
+
+    MonopatinDTO reactivar(Long id);
+
     // --- Operaciones específicas ---
 
     MonopatinDTO cambiarEstado(Long id, String estado);
