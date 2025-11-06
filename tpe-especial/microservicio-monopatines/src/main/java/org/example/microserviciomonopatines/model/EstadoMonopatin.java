@@ -4,5 +4,6 @@ public enum EstadoMonopatin {
     DISPONIBLE,
     EN_USO,
     PAUSADO,
-    EN_MANTENIMIENTO
+    EN_MANTENIMIENTO,
+    DADO_DE_BAJA
 }

@@ -4,6 +4,7 @@ import org.example.microserviciomonopatines.dto.MonopatinDTO;
 import org.example.microserviciomonopatines.model.EstadoMonopatin;
 import org.example.microserviciomonopatines.model.Monopatin;
 import org.example.microserviciomonopatines.repository.MonopatinRepository;
+import org.example.microserviciomonopatines.service.GeoService;
 import org.example.microserviciomonopatines.service.MonopatinService;
 import org.springframework.stereotype.Service;
 
@@ -14,9 +15,11 @@ import java.util.stream.Collectors;
 public class MonopatinServiceImpl implements MonopatinService {
 
     private final MonopatinRepository repository;
+    private final GeoService geoService;
 
-    public MonopatinServiceImpl(MonopatinRepository repository) {
+    public MonopatinServiceImpl(MonopatinRepository repository, GeoService geoService) {
         this.repository = repository;
+        this.geoService = geoService;
     }
 
     @Override
@@ -73,6 +76,24 @@ public class MonopatinServiceImpl implements MonopatinService {
     }
 
     @Override
+    public MonopatinDTO darDeBaja(Long id) {
+        Monopatin monopatin = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Monopatín no encontrado con id " + id));
+        monopatin.setEstado(EstadoMonopatin.DADO_DE_BAJA);
+        Monopatin actualizado = repository.save(monopatin);
+        return toDTO(actualizado);
+    }
+
+    @Override
+    public MonopatinDTO reactivar(Long id) {
+        Monopatin monopatin = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Monopatín no encontrado con id " + id));
+        monopatin.setEstado(EstadoMonopatin.DISPONIBLE);
+        Monopatin actualizado = repository.save(monopatin);
+        return toDTO(actualizado);
+    }
+
+    @Override
     public MonopatinDTO actualizarUbicacion(Long id, Double latitud, Double longitud) {
         Monopatin monopatin = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Monopatín no encontrado con id " + id));
@@ -84,15 +105,6 @@ public class MonopatinServiceImpl implements MonopatinService {
     }
 
     @Override
-    public List<MonopatinDTO> listarCercanos(Double latitud, Double longitud, Double radio) {
-        // TODO: implementar lógica con GeoUtils (distancia)
-        List<Monopatin> todos = repository.findAll();
-        return todos.stream()
-                .map(this::toDTO)
-                .collect(Collectors.toList());
-    }
-
-    @Override
     public Map<String, Long> obtenerDisponibilidad() {
         List<Monopatin> todos = repository.findAll();
 
@@ -100,12 +112,26 @@ public class MonopatinServiceImpl implements MonopatinService {
                 .filter(m -> m.getEstado() == EstadoMonopatin.EN_MANTENIMIENTO) // <- comparar enums
                 .count();
 
-        long enOperacion = todos.size() - enMantenimiento;
+        long dadosDeBaja = todos.stream()
+                .filter(m -> m.getEstado() == EstadoMonopatin.DADO_DE_BAJA)
+                .count();
+
+        long enOperacion = todos.size() - enMantenimiento - dadosDeBaja;
 
         Map<String, Long> resultado = new HashMap<>();
         resultado.put("enOperacion", enOperacion);
         resultado.put("enMantenimiento", enMantenimiento);
+        resultado.put("dadosDeBaja", dadosDeBaja);
         return resultado;
+    }
+
+    @Override
+    public List<MonopatinDTO> listarCercanos(Double lat, Double lon, Double radio) {
+        return repository.findAll()
+                .stream()
+                .filter(m -> geoService.withinRadius(lat, lon, m.getLatitud(), m.getLongitud(), radio))
+                .map(this::toDTO)
+                .collect(Collectors.toList());
     }
 
     // --- Métodos auxiliares de mapeo ---
