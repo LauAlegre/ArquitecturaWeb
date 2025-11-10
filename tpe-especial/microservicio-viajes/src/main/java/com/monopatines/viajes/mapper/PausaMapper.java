@@ -2,34 +2,28 @@ package com.monopatines.viajes.mapper;
 
 import com.monopatines.viajes.dto.PausaDTO;
 import com.monopatines.viajes.model.PausaModel;
+import org.springframework.stereotype.Component;
 
+@Component
 public class PausaMapper {
-    public PausaDTO toDTO(PausaModel pausa) {
-        if (pausa == null) return null;
+    public PausaDTO toDTO(PausaModel p) {
+        if (p == null) return null;
         PausaDTO dto = new PausaDTO();
-        dto.setIdPausa(pausa.getId());
-        dto.setFecha_inicio(pausa.getFecha_inicio());
-        dto.setFecha_fin(pausa.getFecha_fin());
-        dto.setDuracion_minutos(pausa.getDuracion_minutos());
-
-        // evitamos recursión: solo guardamos el id del viaje
-        if (pausa.getViaje() != null) {
-            dto.setId_viaje(pausa.getViaje().getId().intValue());
-        }
-
+        dto.setId(p.getId());
+        dto.setFechaInicio(p.getFechaInicio());
+        dto.setFechaFin(p.getFechaFin());
+        dto.setDuracionMinutos(p.getDuracionMinutos());
+        if (p.getViaje() != null) dto.setViajeId(p.getViaje().getId());
         return dto;
     }
-
     public PausaModel toEntity(PausaDTO dto) {
         if (dto == null) return null;
-        PausaModel pausa = new PausaModel();
-        pausa.setId(dto.getIdPausa());
-        pausa.setFecha_inicio(dto.getFecha_inicio());
-        pausa.setFecha_fin(dto.getFecha_fin());
-        pausa.setDuracion_minutos(dto.getDuracion_minutos());
-        // no seteamos el viaje completo aquí (solo se hará en el servicio si es necesario)
-        return pausa;
+        PausaModel p = new PausaModel();
+        p.setId(dto.getId());
+        p.setFechaInicio(dto.getFechaInicio());
+        p.setFechaFin(dto.getFechaFin());
+        p.setDuracionMinutos(dto.getDuracionMinutos());
+        // viaje se setea en el servicio para evitar referencias incompletas
+        return p;
     }
 }
-
-

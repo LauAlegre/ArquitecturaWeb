@@ -1,25 +1,35 @@
 package com.monopatines.viajes.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 
 @Entity
-@Data
+@Table(name = "pausa")
+@Getter
+@Setter
 @NoArgsConstructor
-@AllArgsConstructor
+@ToString(exclude = "viaje")
 public class PausaModel {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private LocalTime fecha_inicio;
-    private LocalTime fecha_fin;
-    private int duracion_minutos;
 
-    @ManyToOne
-    @JoinColumn(name = "viaje_id", nullable = false)
+    @Column(name = "fecha_inicio")
+    private LocalDateTime fechaInicio;
+
+    @Column(name = "fecha_fin")
+    private LocalDateTime fechaFin;
+
+    @Column(name = "duracion_min")
+    private Integer duracionMinutos;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_viaje", nullable = false)
     private ViajeModel viaje;
 }

@@ -1,10 +1,15 @@
 package com.monopatines.viajes.controller;
 
+import com.monopatines.viajes.dto.UsoDTO;
 import com.monopatines.viajes.dto.ViajeDTO;
+import com.monopatines.viajes.repository.ViajeRepository;
 import com.monopatines.viajes.service.ViajeService;
+import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -17,38 +22,76 @@ public class ViajeController {
         this.service = service;
     }
 
+    // CRUD básico
     @GetMapping
     public List<ViajeDTO> listar() {
-        return service.listar();
+        return service.listar(Pageable.unpaged()).getContent();
     }
 
     @GetMapping("/{id}")
     public ViajeDTO buscarPorId(@PathVariable Long id) {
-        return service.buscarPorId(id);
+        return service.obtenerPorId(id);
     }
 
     @PostMapping
-    public ViajeDTO crear(@RequestParam Long cuentaId, @RequestParam Long monopatinId) {
-        return service.crear(cuentaId, monopatinId);
+    public ViajeDTO crear(@RequestBody ViajeDTO dto) {
+        return service.crear(dto);
     }
 
-    @PutMapping("/{viajeId}/finalizar")
-    public ViajeDTO finalizar(@PathVariable Long viajeId, @RequestParam BigDecimal kmRecorridos) {
-        return service.finalizar(viajeId, kmRecorridos);
+    @PutMapping("/{id}")
+    public ViajeDTO actualizar(@PathVariable Long id, @RequestBody ViajeDTO dto) {
+        return service.actualizar(id, dto);
     }
 
-    @GetMapping("/activo")
-    public ViajeDTO activoPorMonopatin(@RequestParam Long monopatinId) {
-        return service.obtenerActivoPorMonopatin(monopatinId);
+    @DeleteMapping("/{id}")
+    public void eliminar(@PathVariable Long id) {
+        service.eliminar(id);
     }
 
-    @GetMapping(params = "cuentaId")
-    public List<ViajeDTO> listarPorCuenta(@RequestParam Long cuentaId) {
-        return service.listarPorCuenta(cuentaId);
+    // Cerrar viaje (fecha fin ahora, km como parámetro)
+    @PutMapping("/{id}/cerrar")
+    public ViajeDTO cerrarViaje(@PathVariable("id") Long viajeId,
+                                 @RequestParam("kmRecorridos") BigDecimal kmRecorridos) {
+        return service.cerrarViaje(viajeId, java.time.LocalDateTime.now(), kmRecorridos);
     }
 
+    // Filtrar por monopatín (query param)
     @GetMapping(params = "monopatinId")
     public List<ViajeDTO> listarPorMonopatin(@RequestParam Long monopatinId) {
-        return service.listarPorMonopatin(monopatinId);
+        return service.listar(Pageable.unpaged()).getContent()
+                .stream()
+                .filter(v -> v.getMonopatinId() != null && v.getMonopatinId().equals(monopatinId))
+                .toList();
+    }
+
+    // ===== Reportes / uso =====
+
+    @GetMapping("/reporte/monopatines-mas-viajes")
+    public List<ViajeRepository.MonopatinViajesCount> monopatinesMasViajes(@RequestParam int anio,
+                                                                           @RequestParam long minViajes) {
+        return service.monopatinesConMasDeXViajes(anio, minViajes);
+    }
+
+    @GetMapping("/uso-usuarios")
+    public List<ViajeRepository.UsoUsuario> rankingUsuarios(@RequestParam LocalDate desde,
+                                                            @RequestParam LocalDate hasta,
+                                                            @RequestParam(defaultValue = "0") int limite) {
+        return service.usuariosMasActivos(desde, hasta, limite);
+    }
+
+    @GetMapping("/uso-cuenta/{idCuenta}")
+    public UsoDTO usoPorCuentaDTO(@PathVariable Long idCuenta,
+                                  @RequestParam
+                                  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
+                                  @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta) {
+        return service.usoPorCuenta(idCuenta, desde, hasta);
+    }
+
+    @GetMapping("/uso-usuario/{idUsuario}")
+    public UsoDTO usoPorUsuarioDTO(@PathVariable Long idUsuario,
+                                   @RequestParam
+                                   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
+                                   @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta) {
+        return service.usoPorUsuario(idUsuario, desde, hasta);
     }
 }

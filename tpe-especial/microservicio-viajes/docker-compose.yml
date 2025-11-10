@@ -1,0 +1,46 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: viajes_db
+      POSTGRES_USER: viajes_user
+      POSTGRES_PASSWORD: viajes_pass
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U viajes_user -d viajes_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  viajes:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/viajes_db
+      SPRING_DATASOURCE_USERNAME: viajes_user
+      SPRING_DATASOURCE_PASSWORD: viajes_pass
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SERVER_PORT: 8082
+      JAVA_OPTS: "-Xms128m -Xmx512m"
+    restart: on-failure
+    networks:
+      - viajes_network
+
+volumes:
+  db_data:
+
+networks:
+  viajes_network:
+    driver: bridge

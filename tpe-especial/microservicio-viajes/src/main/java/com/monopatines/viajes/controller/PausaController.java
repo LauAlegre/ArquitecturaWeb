@@ -9,34 +9,31 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/viajes/{viajeId}/pausas")
 public class PausaController {
-
     private final PausaService service;
 
     public PausaController(PausaService service) {
         this.service = service;
     }
 
-    // Listar todas las pausas del viaje
     @GetMapping
     public List<PausaDTO> listar(@PathVariable Long viajeId) {
         return service.listarPorViaje(viajeId);
     }
 
-    // Obtener la pausa abierta (si existe)
     @GetMapping("/abierta")
-    public PausaDTO obtenerAbierta(@PathVariable Long viajeId) {
-        return service.obtenerAbierta(viajeId);
+    public PausaDTO abierta(@PathVariable Long viajeId) {
+        return service.pausaAbierta(viajeId);
     }
 
-    // Iniciar una pausa para el viaje
     @PostMapping
     public PausaDTO iniciar(@PathVariable Long viajeId) {
-        return service.iniciar(viajeId);
+        return service.crear(viajeId);
     }
 
-    // Finalizar una pausa específica
-    @PutMapping("/{pausaId}/finalizar")
-    public PausaDTO finalizar(@PathVariable Long viajeId, @PathVariable Long pausaId) {
-        return service.finalizar(viajeId, pausaId);
+    @PutMapping("/{pausaId}")
+    public PausaDTO actualizar(@PathVariable("viajeId") Long viajeId,
+                               @PathVariable("pausaId") Long pausaId,
+                               @RequestBody PausaDTO dto) {
+        return service.actualizar(pausaId, dto);
     }
 }

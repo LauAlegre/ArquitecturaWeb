@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -22,97 +22,76 @@ import java.util.stream.Collectors;
 public class PausaService {
     private final PausaRepository pausaRepository;
     private final ViajeRepository viajeRepository;
-    private final PausaMapper pausaMapper; // suponiendo @Component
+    private final PausaMapper pausaMapper;
 
-    /* ======================
-       ABM (CRUD)
-       ====================== */
-
-    /** Crea una pausa para un viaje. */
-    public PausaDTO crear(PausaDTO dto) {
-        // Validar viaje
-        Long viajeId = (long) dto.getId_viaje();
+    public PausaDTO crear(Long viajeId) {
         ViajeModel viaje = viajeRepository.findById(viajeId)
                 .orElseThrow(() -> new NoSuchElementException("Viaje no encontrado id=" + viajeId));
-
-        // Regla: no permitir dos pausas abiertas a la vez
-        if (existePausaAbierta(viajeId)) {
+        if (pausaRepository.existsByViajeIdAndFechaFinIsNull(viajeId)) {
             throw new IllegalStateException("Ya existe una pausa abierta para el viaje " + viajeId);
         }
-
-        PausaModel entity = pausaMapper.toEntity(dto);
-        entity.setViaje(viaje);
-        PausaModel saved = pausaRepository.save(entity);
-        PausaDTO res = pausaMapper.toDTO(saved);
-        res.setId_viaje(saved.getViaje().getIdViaje().intValue());
-        return res;
+        PausaModel p = new PausaModel();
+        p.setFechaInicio(LocalDateTime.now());
+        p.setViaje(viaje);
+        PausaModel saved = pausaRepository.save(p);
+        return pausaMapper.toDTO(saved);
     }
 
     @Transactional(readOnly = true)
     public PausaDTO obtenerPorId(Long id) {
-        PausaModel p = pausaRepository.findById(id)
+        return pausaRepository.findById(id).map(pausaMapper::toDTO)
                 .orElseThrow(() -> new NoSuchElementException("Pausa no encontrada id=" + id));
-        return pausaMapper.toDTO(p);
     }
 
     @Transactional(readOnly = true)
     public List<PausaDTO> listarPorViaje(Long viajeId) {
-        // Requiere método en repo: findByViajeId(Long)
-        List<PausaModel> pausas = pausaRepository.findByViajeId(viajeId);
-        return pausas.stream().map(pausaMapper::toDTO).collect(Collectors.toList());
+        return pausaRepository.findByViajeId(viajeId).stream().map(pausaMapper::toDTO).collect(Collectors.toList());
     }
 
-    public PausaDTO actualizar(Long id, PausaDTO dto) {
-        PausaModel existente = pausaRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Pausa no encontrada id=" + id));
-
-        existente.setFechaInicio(dto.getFecha_inicio());
-        existente.setFechaFin(dto.getFecha_fin());
-        existente.setDuracionMinutos(dto.getDuracion_minutos());
-
-        return pausaMapper.toDTO(pausaRepository.save(existente));
-    }
-
-    public void eliminar(Long id) {
-        if (!pausaRepository.existsById(id)) {
-            throw new NoSuchElementException("Pausa no encontrada id=" + id);
-        }
-        pausaRepository.deleteById(id);
-    }
-
-    /* ======================
-       Reglas/operaciones de negocio
-       ====================== */
-
-    /** Cierra una pausa, calcula duración (minutos) y guarda. */
-    public PausaDTO cerrarPausa(Long pausaId, LocalTime fechaFin) {
+    public PausaDTO cerrar(Long pausaId) {
         PausaModel pausa = pausaRepository.findById(pausaId)
                 .orElseThrow(() -> new NoSuchElementException("Pausa no encontrada id=" + pausaId));
-
-        if (pausa.getFechaFin() != null) {
-            throw new IllegalStateException("La pausa ya está cerrada");
-        }
-        pausa.setFechaFin(fechaFin);
-
-        // cálculo simple con LocalTime del mismo día; si manejás días distintos, adaptá a LocalDateTime
+        if (pausa.getFechaFin() != null) throw new IllegalStateException("La pausa ya está cerrada");
+        pausa.setFechaFin(LocalDateTime.now());
         long mins = Duration.between(pausa.getFechaInicio(), pausa.getFechaFin()).toMinutes();
         pausa.setDuracionMinutos((int) Math.max(mins, 0));
-
         return pausaMapper.toDTO(pausaRepository.save(pausa));
     }
 
-    /** ¿Existe alguna pausa abierta (sin fecha_fin) para el viaje? */
     @Transactional(readOnly = true)
-    public boolean existePausaAbierta(Long viajeId) {
-        return pausaRepository.existsByViajeIdAndFechaFinIsNull(viajeId);
-    }
-
-    /** Devuelve la última pausa abierta del viaje (si hay). */
-    @Transactional(readOnly = true)
-    public PausaDTO ultimaPausaAbierta(Long viajeId) {
-        return pausaRepository
-                .findFirstByViajeIdAndFechaFinIsNullOrderByFechaInicioDesc(viajeId)
+    public PausaDTO pausaAbierta(Long viajeId) {
+        return pausaRepository.findFirstByViajeIdAndFechaFinIsNullOrderByFechaInicioDesc(viajeId)
                 .map(pausaMapper::toDTO)
                 .orElse(null);
+    }
+
+    public PausaDTO actualizar(Long pausaId, PausaDTO dto) {
+        PausaModel pausa = pausaRepository.findById(pausaId)
+                .orElseThrow(() -> new NoSuchElementException("Pausa no encontrada id=" + pausaId));
+
+        // Opcional: re-asociar a otro viaje si se envía un viajeId diferente
+        if (dto.getViajeId() != null && (pausa.getViaje() == null || !dto.getViajeId().equals(pausa.getViaje().getId()))) {
+            ViajeModel viaje = viajeRepository.findById(dto.getViajeId())
+                    .orElseThrow(() -> new NoSuchElementException("Viaje no encontrado id=" + dto.getViajeId()));
+            pausa.setViaje(viaje);
+        }
+
+        if (dto.getFechaInicio() != null) {
+            pausa.setFechaInicio(dto.getFechaInicio());
+        }
+        if (dto.getFechaFin() != null) {
+            pausa.setFechaFin(dto.getFechaFin());
+        }
+
+        // Si hay ambas fechas, recalcular duración; si no, permitir setear manualmente
+        if (pausa.getFechaInicio() != null && pausa.getFechaFin() != null) {
+            long mins = Duration.between(pausa.getFechaInicio(), pausa.getFechaFin()).toMinutes();
+            pausa.setDuracionMinutos((int) Math.max(mins, 0));
+        } else if (dto.getDuracionMinutos() != null) {
+            pausa.setDuracionMinutos(dto.getDuracionMinutos());
+        }
+
+        PausaModel saved = pausaRepository.save(pausa);
+        return pausaMapper.toDTO(saved);
     }
 }
