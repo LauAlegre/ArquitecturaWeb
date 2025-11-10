@@ -1,0 +1,24 @@
+//////// FACTURA ////////
+Generar factura
+POST /facturas/generar
+
+Listar facturas
+GET /facturas
+
+GET Obtener factura por id
+/facturas/{id}
+
+Total facturado por rango de meses (de un año)
+GET /facturas/total?anio=2025&mesInicio=2&mesFin=3
+
+
+
+//////// TARIFA ////////
+Obtener tarifa vigente
+GET /tarifas/vigente
+
+Crear un ajuste de tarifa
+POST /tarifas/ajuste
+
+Consultar historial de tarifas
+GET /tarifas/historial
