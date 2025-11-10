@@ -21,7 +21,11 @@ public class Usuario {
     private String apellido;
     private String email;
     private String celular;
+    @Enumerated(EnumType.STRING)
+    private Rol rol;
 
     @ManyToMany(mappedBy = "usuarios")
     private List<Cuenta> cuentas;
+
+
 }

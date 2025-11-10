@@ -15,4 +15,6 @@ public class CuentaDTO {
     private Double saldo;
     private Boolean activa;
     private String mercadoPagoId;
+    private String tipoCuenta;
+
 }

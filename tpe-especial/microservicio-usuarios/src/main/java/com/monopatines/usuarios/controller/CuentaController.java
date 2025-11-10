@@ -49,5 +49,13 @@ public class CuentaController {
     public void activarCuenta(@PathVariable Long id) {
         service.activarCuenta(id);
     }
+
+    @PostMapping("/{idCuenta}/asociar-usuario/{idUsuario}")
+    public CuentaDTO asociarUsuario(
+            @PathVariable Long idCuenta,
+            @PathVariable Long idUsuario) {
+        return service.asociarUsuario(idCuenta, idUsuario);
+    }
+
 }
 

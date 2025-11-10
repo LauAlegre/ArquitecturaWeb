@@ -23,6 +23,10 @@ public class Cuenta {
     private Boolean activa;
     private String mercadoPagoId;
 
+    @Enumerated(EnumType.STRING)
+    private TipoCuenta tipoCuenta;
+
+
     @ManyToMany
     private List<Usuario> usuarios;
 }

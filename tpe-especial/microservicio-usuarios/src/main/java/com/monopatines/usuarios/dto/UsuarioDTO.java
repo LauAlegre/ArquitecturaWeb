@@ -13,4 +13,7 @@ public class UsuarioDTO {
     private String apellido;
     private String email;
     private String celular;
+    private String rol;
+
+
 }

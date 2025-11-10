@@ -1,8 +1,11 @@
 package com.monopatines.usuarios.controller;
 
+import com.monopatines.usuarios.dto.UsoCuentaDTO;
 import com.monopatines.usuarios.dto.UsuarioDTO;
 import com.monopatines.usuarios.service.UsuarioService;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -39,4 +42,13 @@ public class UsuarioController {
     public void eliminar(@PathVariable Long id) {
         service.eliminar(id);
     }
+
+    @GetMapping("/{id}/uso")
+    public UsoCuentaDTO obtenerUso(@PathVariable Long id,
+                                   @RequestParam LocalDate desde,
+                                   @RequestParam LocalDate hasta,
+                                   @RequestParam(defaultValue = "false") boolean incluirRelacionados) {
+        return service.obtenerUso(id, desde, hasta, incluirRelacionados);
+    }
+
 }
