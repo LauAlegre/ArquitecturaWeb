@@ -5,6 +5,7 @@ import org.example.microserviciomonopatines.model.Parada;
 import org.example.microserviciomonopatines.repository.ParadaRepository;
 import org.example.microserviciomonopatines.service.ParadaService;
 import org.springframework.stereotype.Service;
+import org.example.microserviciomonopatines.mapper.ParadaMapper;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -13,31 +14,33 @@ import java.util.stream.Collectors;
 public class ParadaServiceImpl implements ParadaService {
 
     private final ParadaRepository repository;
+    private final ParadaMapper mapper;
 
-    public ParadaServiceImpl(ParadaRepository repository) {
+    public ParadaServiceImpl(ParadaRepository repository, ParadaMapper mapper) {
         this.repository = repository;
+        this.mapper = mapper;
     }
 
     @Override
     public List<ParadaDTO> listar() {
         return repository.findAll()
                 .stream()
-                .map(this::toDTO)
+                .map(mapper::toDTO)
                 .collect(Collectors.toList());
     }
 
     @Override
     public ParadaDTO buscarPorId(Long id) {
         return repository.findById(id)
-                .map(this::toDTO)
+                .map(mapper::toDTO)
                 .orElseThrow(() -> new RuntimeException("Parada no encontrada con id " + id));
     }
 
     @Override
     public ParadaDTO crear(ParadaDTO dto) {
-        Parada parada = toEntity(dto);
+        Parada parada = mapper.toEntity(dto);
         Parada guardada = repository.save(parada);
-        return toDTO(guardada);
+        return mapper.toDTO(guardada);
     }
 
     @Override
@@ -51,7 +54,7 @@ public class ParadaServiceImpl implements ParadaService {
         existente.setCapacidad(dto.getCapacidad());
 
         Parada actualizada = repository.save(existente);
-        return toDTO(actualizada);
+        return mapper.toDTO(actualizada);
     }
 
     @Override
@@ -59,23 +62,4 @@ public class ParadaServiceImpl implements ParadaService {
         repository.deleteById(id);
     }
 
-    // --- Métodos auxiliares de mapeo ---
-
-    private ParadaDTO toDTO(Parada p) {
-        return new ParadaDTO(
-                p.getId(),
-                p.getNombre(),
-                p.getLatitud(),
-                p.getLongitud(),
-                p.getCapacidad());
-    }
-
-    private Parada toEntity(ParadaDTO dto) {
-        Parada p = new Parada();
-        p.setNombre(dto.getNombre());
-        p.setLatitud(dto.getLatitud());
-        p.setLongitud(dto.getLongitud());
-        p.setCapacidad(dto.getCapacidad());
-        return p;
-    }
 }

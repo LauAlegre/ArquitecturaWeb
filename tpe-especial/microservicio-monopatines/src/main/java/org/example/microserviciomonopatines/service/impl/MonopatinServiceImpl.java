@@ -7,6 +7,7 @@ import org.example.microserviciomonopatines.repository.MonopatinRepository;
 import org.example.microserviciomonopatines.service.GeoService;
 import org.example.microserviciomonopatines.service.MonopatinService;
 import org.springframework.stereotype.Service;
+import org.example.microserviciomonopatines.mapper.MonopatinMapper;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -16,32 +17,34 @@ public class MonopatinServiceImpl implements MonopatinService {
 
     private final MonopatinRepository repository;
     private final GeoService geoService;
+    private final MonopatinMapper mapper;
 
-    public MonopatinServiceImpl(MonopatinRepository repository, GeoService geoService) {
+    public MonopatinServiceImpl(MonopatinRepository repository, GeoService geoService, MonopatinMapper mapper) {
         this.repository = repository;
         this.geoService = geoService;
+        this.mapper = mapper;
     }
 
     @Override
     public List<MonopatinDTO> listar() {
         return repository.findAll()
                 .stream()
-                .map(this::toDTO)
+                .map(mapper::toDTO)
                 .collect(Collectors.toList());
     }
 
     @Override
     public MonopatinDTO buscarPorId(Long id) {
         return repository.findById(id)
-                .map(this::toDTO)
+                .map(mapper::toDTO)
                 .orElseThrow(() -> new RuntimeException("Monopatín no encontrado con id " + id));
     }
 
     @Override
     public MonopatinDTO crear(MonopatinDTO dto) {
-        Monopatin monopatin = toEntity(dto);
+        Monopatin monopatin = mapper.toEntity(dto);
         Monopatin guardado = repository.save(monopatin);
-        return toDTO(guardado);
+        return mapper.toDTO(guardado);
     }
 
     @Override
@@ -57,7 +60,7 @@ public class MonopatinServiceImpl implements MonopatinService {
         existente.setParadaId(dto.getParadaId());
 
         Monopatin actualizado = repository.save(existente);
-        return toDTO(actualizado);
+        return mapper.toDTO(actualizado);
     }
 
     @Override
@@ -72,7 +75,7 @@ public class MonopatinServiceImpl implements MonopatinService {
 
         monopatin.setEstado(parseEstado(estado)); // <- enum
         Monopatin actualizado = repository.save(monopatin);
-        return toDTO(actualizado);
+        return mapper.toDTO(actualizado);
     }
 
     @Override
@@ -81,7 +84,7 @@ public class MonopatinServiceImpl implements MonopatinService {
                 .orElseThrow(() -> new RuntimeException("Monopatín no encontrado con id " + id));
         monopatin.setEstado(EstadoMonopatin.DADO_DE_BAJA);
         Monopatin actualizado = repository.save(monopatin);
-        return toDTO(actualizado);
+        return mapper.toDTO(actualizado);
     }
 
     @Override
@@ -90,7 +93,7 @@ public class MonopatinServiceImpl implements MonopatinService {
                 .orElseThrow(() -> new RuntimeException("Monopatín no encontrado con id " + id));
         monopatin.setEstado(EstadoMonopatin.DISPONIBLE);
         Monopatin actualizado = repository.save(monopatin);
-        return toDTO(actualizado);
+        return mapper.toDTO(actualizado);
     }
 
     @Override
@@ -101,7 +104,7 @@ public class MonopatinServiceImpl implements MonopatinService {
         monopatin.setLatitud(latitud);
         monopatin.setLongitud(longitud);
         Monopatin actualizado = repository.save(monopatin);
-        return toDTO(actualizado);
+        return mapper.toDTO(actualizado);
     }
 
     @Override
@@ -130,32 +133,8 @@ public class MonopatinServiceImpl implements MonopatinService {
         return repository.findAll()
                 .stream()
                 .filter(m -> geoService.withinRadius(lat, lon, m.getLatitud(), m.getLongitud(), radio))
-                .map(this::toDTO)
+                .map(mapper::toDTO)
                 .collect(Collectors.toList());
-    }
-
-    // --- Métodos auxiliares de mapeo ---
-
-    private MonopatinDTO toDTO(Monopatin m) {
-        return new MonopatinDTO(
-                m.getId(),
-                m.getEstado(),
-                m.getLatitud(),
-                m.getLongitud(),
-                m.getTotalKm(),
-                m.getTotalTiempoUso(),
-                m.getParadaId());
-    }
-
-    private Monopatin toEntity(MonopatinDTO dto) {
-        Monopatin m = new Monopatin();
-        m.setEstado(dto.getEstado());
-        m.setLatitud(dto.getLatitud());
-        m.setLongitud(dto.getLongitud());
-        m.setTotalKm(dto.getTotalKm());
-        m.setTotalTiempoUso(dto.getTotalTiempoUso());
-        m.setParadaId(dto.getParadaId());
-        return m;
     }
 
     private EstadoMonopatin parseEstado(String raw) {
