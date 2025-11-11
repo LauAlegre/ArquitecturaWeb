@@ -12,11 +12,10 @@ public class ViajesClient {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    // 🔹 trae los viajes por usuario
+    // 🔹 Trae los viajes por usuario (usa path variable)
     public UsoCuentaDTO obtenerUsoPorUsuario(Long idUsuario, LocalDate desde, LocalDate hasta) {
         String url = UriComponentsBuilder
-                .fromHttpUrl("http://localhost:8082/viajes/uso-usuario")
-                .queryParam("idUsuario", idUsuario)
+                .fromHttpUrl("http://localhost:8081/api/v1/viajes/uso-usuario/" + idUsuario)
                 .queryParam("desde", desde)
                 .queryParam("hasta", hasta)
                 .toUriString();
@@ -24,11 +23,10 @@ public class ViajesClient {
         return restTemplate.getForObject(url, UsoCuentaDTO.class);
     }
 
-    // 🔹 trae los viajes por cuenta
+    // 🔹 Trae los viajes por cuenta (usa path variable)
     public UsoCuentaDTO obtenerUsoPorCuenta(Long idCuenta, LocalDate desde, LocalDate hasta) {
         String url = UriComponentsBuilder
-                .fromHttpUrl("http://localhost:8082/viajes/uso-cuenta")
-                .queryParam("idCuenta", idCuenta)
+                .fromHttpUrl("http://localhost:8081/api/v1/viajes/uso-cuenta/" + idCuenta)
                 .queryParam("desde", desde)
                 .queryParam("hasta", hasta)
                 .toUriString();
