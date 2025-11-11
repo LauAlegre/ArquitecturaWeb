@@ -94,4 +94,16 @@ public class ViajeController {
                                    @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta) {
         return service.usoPorUsuario(idUsuario, desde, hasta);
     }
+
+    // Ranking de usuarios por tipo. Pasar usuarioIds del tipo desde el microservicio de usuarios.
+    // Ejemplo: /uso-usuarios-por-tipo?desde=2025-01-01&hasta=2025-01-31&tipoUsuario=PREMIUM&usuarioIds=1&usuarioIds=2&limite=10
+    @GetMapping("/uso-usuarios-por-tipo")
+    public List<ViajeRepository.UsoUsuario> rankingUsuariosPorTipo(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta,
+            @RequestParam String tipoUsuario,
+            @RequestParam(name = "usuarioIds") List<Long> usuarioIdsDelTipo,
+            @RequestParam(defaultValue = "0") int limite) {
+        return service.usuariosMasActivosPorTipo(desde, hasta, tipoUsuario, usuarioIdsDelTipo, limite);
+    }
 }

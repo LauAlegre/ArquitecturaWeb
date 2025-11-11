@@ -148,4 +148,30 @@ public class ViajeService {
         }
         return new UsoDTO(usuarioId, kmTotales, minutosTotales, cantidad);
     }
+
+    /* Ranking de usuarios por uso filtrado por período y tipo de usuario.
+       NOTA: usuarioIdsDelTipo debe venir del microservicio de usuarios según el tipo solicitado. */
+    @Transactional(readOnly = true)
+    public List<ViajeRepository.UsoUsuario> usuariosMasActivosPorTipo(LocalDate desde,
+                                                                       LocalDate hasta,
+                                                                       String tipoUsuario,
+                                                                       List<Long> usuarioIdsDelTipo,
+                                                                       int limite) {
+        if (desde.isAfter(hasta)) {
+            throw new IllegalArgumentException("El parámetro 'desde' no puede ser posterior a 'hasta'.");
+        }
+        if (usuarioIdsDelTipo == null || usuarioIdsDelTipo.isEmpty()) {
+            return List.of(); // No hay usuarios del tipo => no hay ranking
+        }
+        LocalDateTime inicio = desde.atStartOfDay();
+        LocalDateTime fin = hasta.plusDays(1).atStartOfDay();
+
+        List<ViajeRepository.UsoUsuario> lista =
+                viajeRepository.findUsoUsuariosPeriodoPorIds(inicio, fin, usuarioIdsDelTipo);
+
+        if (limite > 0 && lista.size() > limite) {
+            return lista.subList(0, limite);
+        }
+        return lista;
+    }
 }

@@ -108,4 +108,22 @@ public interface ViajeRepository extends JpaRepository<ViajeModel, Long> {
     List<UsoCuenta> findUsoCuenta(@Param("idCuenta") Long idCuenta,
                                   @Param("desde") LocalDateTime desde,
                                   @Param("hasta") LocalDateTime hasta);
+
+    /* ===== Ranking por período restringido a un conjunto de usuarios (p.ej. de un tipo dado). */
+    @Query(value = """
+        select 
+          v.id_usuario as usuarioId,
+          count(v.id_viaje) as cantidadViajes,
+          coalesce(sum(v.km_recorridos),0) as totalKm,
+          coalesce(sum(TIMESTAMPDIFF(MINUTE, v.fecha_inicio, v.fecha_fin)),0) as totalMinutos
+        from viaje v
+        where v.fecha_inicio >= :desde and v.fecha_inicio < :hasta
+          and v.fecha_fin is not null
+          and v.id_usuario in (:usuarios)
+        group by v.id_usuario
+        order by totalMinutos desc
+        """, nativeQuery = true)
+    List<UsoUsuario> findUsoUsuariosPeriodoPorIds(@Param("desde") LocalDateTime desde,
+                                                  @Param("hasta") LocalDateTime hasta,
+                                                  @Param("usuarios") List<Long> usuarios);
 }
