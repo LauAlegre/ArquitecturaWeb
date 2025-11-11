@@ -1,6 +1,7 @@
 package org.example.microserviciomonopatines.controller;
 
 import org.example.microserviciomonopatines.dto.MonopatinDTO;
+import org.example.microserviciomonopatines.dto.MonopatinReporteDTO;
 import org.example.microserviciomonopatines.service.MonopatinService;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -64,5 +65,10 @@ public class MonopatinController {
     @GetMapping("/disponibilidad")
     public Object obtenerDisponibilidad() {
         return service.obtenerDisponibilidad();
+    }
+
+    @GetMapping("/reporte/km")
+    public List<MonopatinReporteDTO> generarReporteKm(@RequestParam(defaultValue = "false") boolean incluirPausas) {
+        return service.generarReporteKm(incluirPausas);
     }
 }

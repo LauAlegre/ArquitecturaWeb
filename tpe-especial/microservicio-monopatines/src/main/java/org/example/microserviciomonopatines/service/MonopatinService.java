@@ -1,6 +1,8 @@
 package org.example.microserviciomonopatines.service;
 
 import org.example.microserviciomonopatines.dto.MonopatinDTO;
+import org.example.microserviciomonopatines.dto.MonopatinReporteDTO;
+
 import java.util.List;
 import java.util.Map;
 
@@ -29,4 +31,6 @@ public interface MonopatinService {
     List<MonopatinDTO> listarCercanos(Double latitud, Double longitud, Double radio);
 
     Map<String, Long> obtenerDisponibilidad();
+
+    List<MonopatinReporteDTO> generarReporteKm(boolean incluirPausas);
 }

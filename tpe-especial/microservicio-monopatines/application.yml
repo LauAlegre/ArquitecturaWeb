@@ -1,0 +1,51 @@
+spring:
+  application:
+    name: monopatines-service
+
+# perfil default (local/dev) usa H2 in-memory
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+  datasource:
+    url: jdbc:h2:mem:monopatines;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+  h2:
+    console:
+      enabled: true
+  server:
+    port: 8080
+
+# perfil DOCKER (Postgres) - usado por docker-compose
+---
+spring:
+  config:
+    activate:
+      on-profile: docker
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:monopatines-db}:${DB_PORT:5432}/${DB_NAME:monopatines}
+    username: ${DB_USER:monopatines_user}
+    password: ${DB_PASS:monopatines_pass}
+  jpa:
+    hibernate:
+      ddl-auto: validate   # Cambiar a update sólo si necesitás; preferible validate + Flyway
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+server:
+  port: ${SERVER_PORT:8080}
+logging:
+  level:
+    root: INFO

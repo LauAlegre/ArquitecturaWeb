@@ -1,6 +1,7 @@
 package org.example.microserviciomonopatines.service.impl;
 
 import org.example.microserviciomonopatines.dto.MonopatinDTO;
+import org.example.microserviciomonopatines.dto.MonopatinReporteDTO;
 import org.example.microserviciomonopatines.model.EstadoMonopatin;
 import org.example.microserviciomonopatines.model.Monopatin;
 import org.example.microserviciomonopatines.repository.MonopatinRepository;
@@ -135,6 +136,27 @@ public class MonopatinServiceImpl implements MonopatinService {
                 .filter(m -> geoService.withinRadius(lat, lon, m.getLatitud(), m.getLongitud(), radio))
                 .map(mapper::toDTO)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<MonopatinReporteDTO> generarReporteKm(boolean incluirPausas) {
+        List<Monopatin> monopatines = repository.findAll();
+
+        return monopatines.stream().map(m -> {
+            double km = m.getTotalKm() != null ? m.getTotalKm() : 0.0;
+            double tiempo = incluirPausas && m.getTotalTiempoUso() != null
+                    ? m.getTotalTiempoUso()
+                    : 0.0;
+
+            boolean requiereMantenimiento = km >= 1000 || tiempo >= 500;
+            // 🔧 criterio de mantenimiento de ejemplo
+
+            return new MonopatinReporteDTO(
+                    m.getId(),
+                    km,
+                    tiempo,
+                    requiereMantenimiento);
+        }).collect(Collectors.toList());
     }
 
     private EstadoMonopatin parseEstado(String raw) {
