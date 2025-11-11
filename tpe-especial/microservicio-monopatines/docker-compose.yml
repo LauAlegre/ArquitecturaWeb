@@ -1,0 +1,50 @@
+version: "3.9"
+
+services:
+  monopatines-db:
+    image: postgres:16
+    container_name: monopatines-db
+    environment:
+      POSTGRES_DB: monopatines
+      POSTGRES_USER: monopatines_user
+      POSTGRES_PASSWORD: monopatines_pass
+    ports:
+      - "5434:5432"                # expone DB al host (útil para adminer/psql local)
+    volumes:
+      - monopatines_data:/var/lib/postgresql/data
+      - ./src/main/resources/db/init:/docker-entrypoint-initdb.d # opcional seeds
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U monopatines_user -d monopatines || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - monopatines-net
+
+  monopatines-service:
+    build:
+      context: .
+      dockerfile: dockerfile   # <- apunta al archivo 'dockerfile' existente (minúsculas)
+    container_name: monopatines-service
+    depends_on:
+      monopatines-db:
+        condition: service_healthy
+    environment:
+      DB_HOST: monopatines-db
+      DB_PORT: "5432"
+      DB_NAME: monopatines
+      DB_USER: monopatines_user
+      DB_PASS: monopatines_pass
+      SERVER_PORT: "8080"
+      SPRING_PROFILES_ACTIVE: docker
+    ports:
+      - "8081:8080"   # host:container
+    networks:
+      - monopatines-net
+
+volumes:
+  monopatines_data:
+
+networks:
+  monopatines-net:
+    driver: bridge
