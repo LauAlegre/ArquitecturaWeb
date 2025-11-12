@@ -39,4 +39,8 @@ public class FacturaController {
             @RequestParam int mesFin) {
         return facturaService.totalFacturado(anio, mesInicio, mesFin);
     }
+    @GetMapping("/todas")
+    public Iterable<Factura> getAll() {
+        return facturaService.obtenerTodas();
+    }
 }

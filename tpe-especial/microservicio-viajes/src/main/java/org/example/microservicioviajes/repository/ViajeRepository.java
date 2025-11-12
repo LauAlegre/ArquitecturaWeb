@@ -113,7 +113,7 @@ public interface ViajeRepository extends JpaRepository<ViajeModel, Long> {
     @Query(value = """
         select 
           v.id_usuario as usuarioId,
-          count(v.id_viaje) as cantidadViajes,
+          count(v.id) as cantidadViajes,
           coalesce(sum(v.km_recorridos),0) as totalKm,
           coalesce(sum(TIMESTAMPDIFF(MINUTE, v.fecha_inicio, v.fecha_fin)),0) as totalMinutos
         from viaje v

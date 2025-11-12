@@ -6,7 +6,6 @@ import org.example.microservicioviajes.client.FacturaClientViajes;
 import org.example.microservicioviajes.dto.ViajeDTO;
 import org.example.microservicioviajes.dto.UsoDTO;
 import org.example.microservicioviajes.dto.DatosDeFacturacionDTO;
-import org.example.microservicioviajes.dto.ResumenViajeDTO;
 import org.example.microservicioviajes.mapper.ViajeMapper;
 import org.example.microservicioviajes.model.ViajeModel;
 import org.example.microservicioviajes.repository.ViajeRepository;
@@ -92,7 +91,7 @@ public class ViajeService {
      */
 
     /** Cierra un viaje y devuelve resumen. */
-    public ResumenViajeDTO cerrarViaje(Long id, LocalDateTime fechaFin, Double kmRecorridos) {
+    public DatosDeFacturacionDTO cerrarViaje(Long id, LocalDateTime fechaFin, Double kmRecorridos) {
         ViajeModel v = viajeRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Viaje no encontrado id=" + id));
         if (v.getFechaFin() != null) {
@@ -107,6 +106,7 @@ public class ViajeService {
         if (v.getFechaInicio() != null) {
             minutosTotales = Duration.between(v.getFechaInicio(), finCalculado).toMinutes();
         }
+
 
         long minutosPausas = java.util.Optional.ofNullable(
                 pausaRepository.sumDuracionMinutosByViajeId(v.getId())).orElse(0L);
@@ -130,12 +130,9 @@ public class ViajeService {
         );
         facturaClientViajes.generarFactura(datos);
 
-        return new DatosDeFacturacionDTO() (
-                v.getId(),
-                (int) minutosTotales,
-                (int) minutosPausas,
-                kmRecorridos != null ? kmRecorridos : 0d);
+        return datos;
     }
+
 
     /**
      * Reporte: monopatines con más de X viajes en un año (requiere usuario admin).

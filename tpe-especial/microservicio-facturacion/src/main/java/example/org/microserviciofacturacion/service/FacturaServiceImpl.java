@@ -93,4 +93,8 @@ public class FacturaServiceImpl implements FacturaService {
         return facturaRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Factura no encontrada: " + id));
     }
+    @Override
+    public Iterable<Factura> obtenerTodas() {
+        return facturaRepository.findAll();
+    }
 }

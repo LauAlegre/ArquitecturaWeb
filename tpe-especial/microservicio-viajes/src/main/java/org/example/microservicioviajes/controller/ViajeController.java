@@ -1,6 +1,6 @@
 package org.example.microservicioviajes.controller;
 
-import org.example.microservicioviajes.dto.ResumenViajeDTO;
+import org.example.microservicioviajes.dto.DatosDeFacturacionDTO;
 import org.example.microservicioviajes.dto.UsoDTO;
 import org.example.microservicioviajes.dto.ViajeDTO;
 import org.example.microservicioviajes.repository.ViajeRepository;
@@ -50,8 +50,8 @@ public class ViajeController {
 
     // Cerrar viaje (devuelve resumen)
     @PutMapping("/{id}/cerrar")
-    public ResumenViajeDTO cerrarViaje(@PathVariable("id") Long viajeId,
-            @RequestParam("kmRecorridos") Double kmRecorridos) {
+    public DatosDeFacturacionDTO cerrarViaje(@PathVariable("id") Long viajeId,
+                                             @RequestParam("kmRecorridos") Double kmRecorridos) {
         return service.cerrarViaje(viajeId, java.time.LocalDateTime.now(), kmRecorridos);
     }
 
