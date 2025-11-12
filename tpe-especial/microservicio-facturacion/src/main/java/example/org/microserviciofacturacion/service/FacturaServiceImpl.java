@@ -1,5 +1,7 @@
 package example.org.microserviciofacturacion.service;
 
+import example.org.microserviciofacturacion.client.CuentaClient;
+import example.org.microserviciofacturacion.dto.DatosDeFacturacionDto;
 import example.org.microserviciofacturacion.dto.FacturaDto;
 import example.org.microserviciofacturacion.mapper.Facturamapper;
 import example.org.microserviciofacturacion.mapper.Facturamapper;
@@ -17,6 +19,7 @@ public class FacturaServiceImpl implements FacturaService {
     private final FacturaRepository facturaRepository;
     private final TarifaService tarifaService;
     private final Facturamapper facturaMapper;
+    private final CuentaClient cuentaClient = new CuentaClient();
 
     public FacturaServiceImpl(FacturaRepository facturaRepository,
                               TarifaService tarifaService,
@@ -26,36 +29,57 @@ public class FacturaServiceImpl implements FacturaService {
         this.facturaMapper = facturaMapper;
     }
 
-    @Transactional
     @Override
-    public Factura generarFactura(FacturaDto dto) {
+    @Transactional
+    public Factura generarFactura(DatosDeFacturacionDto dto) {
 
+        // 1️⃣ Validaciones básicas
         if (dto.getIdCuenta() == null || dto.getIdViaje() == null)
             throw new IllegalArgumentException("idCuenta e idViaje son obligatorios");
-        if (dto.getMinutos() <= 0)
-            throw new IllegalArgumentException("minutos debe ser mayor a 0");
+        if (dto.getMinutosViaje() <= 0)
+            throw new IllegalArgumentException("Los minutos de viaje deben ser mayores a 0");
 
-        // Fecha de emisión
+        // 2️⃣ Fecha de emisión
         LocalDate fecha = (dto.getFechaEmision() == null) ? LocalDate.now() : dto.getFechaEmision();
 
-        // Tarifa vigente a esa fecha
+        // 3️⃣ Tarifa vigente según la fecha
         Tarifa tarifa = tarifaService.vigente(fecha);
 
-        // Cálculo del monto
-        double monto = dto.getMinutos() * tarifa.getPrecioMinuto();
-        if (dto.isPausaExtensa()) {
-            monto += tarifa.getPrecioExtraPausa();
+        // 4️⃣ Cálculo del monto base
+        double monto = dto.getMinutosViaje() * tarifa.getPrecioMinuto();
+
+        // 5️⃣ Evaluar pausas (cortas o extensas)
+        if (dto.getMinutosPausa() > 0) {
+            if (dto.getMinutosPausa() > 15) {
+                // 🕒 Pausa extensa → tarifa extra definida por admin
+                monto += tarifa.getPrecioExtraPausa();
+            } else {
+                // ⏸ Pausa corta → se cobra al precio normal
+                monto += dto.getMinutosPausa() * tarifa.getPrecioMinuto();
+            }
         }
 
-        // Base desde mapper
-        Factura f = Facturamapper.toEntity(dto);
+        // 6️⃣ Crear la entidad Factura
+        Factura factura = new Factura();
+        factura.setIdCuenta(dto.getIdCuenta());
+        factura.setIdViaje(dto.getIdViaje());
+        factura.setFechaEmision(fecha);
+        factura.setMontoTotal(monto);
 
-        // Campos calculados/derivados
-        f.setFechaEmision(fecha);   // si tu entidad tiene setFecha_emision, cambialo
-        f.setMontoTotal(monto);     // si tiene setMonto_total, cambialo
+        // 7️⃣ Guardar en BD
+        Factura guardada = facturaRepository.save(factura);
 
-        return facturaRepository.save(f);
+        // 8️⃣ Comunicar al microservicio Usuarios para debitar el saldo
+        try {
+            cuentaClient.debitarSaldo(dto.getIdCuenta(), monto);
+        } catch (Exception e) {
+            // Si falla el débito, revertimos la creación de la factura
+            throw new RuntimeException("Error al debitar saldo en el microservicio de usuarios: " + e.getMessage());
+        }
+
+        return guardada;
     }
+
 
     @Override
     public Double totalFacturado(int anio, int mesInicio, int mesFin) {

@@ -1,5 +1,6 @@
 package example.org.microserviciofacturacion.controller;
 
+import example.org.microserviciofacturacion.dto.DatosDeFacturacionDto;
 import example.org.microserviciofacturacion.dto.FacturaDto;
 import example.org.microserviciofacturacion.model.Factura;
 import example.org.microserviciofacturacion.service.FacturaService;
@@ -20,9 +21,10 @@ public class FacturaController {
     // Endpoint POST → /facturas/generar
     // Recibe un JSON con datos del viaje y genera una factura
     @PostMapping("/generar")
-    public Factura generar(@RequestBody FacturaDto req) {
+    public Factura generarFactura(@RequestBody DatosDeFacturacionDto req) {
         return facturaService.generarFactura(req);
     }
+
 
 
 

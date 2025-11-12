@@ -97,5 +97,20 @@ public class CuentaService {
 
         return mapper.toDTO(cuenta);
     }
+    public void debitarSaldo(Long idCuenta, double monto) {
+        Cuenta cuenta = repo.findById(idCuenta)
+                .orElseThrow(() -> new RuntimeException("Cuenta no encontrada"));
+
+        if (cuenta.getSaldo() == null) {
+            throw new RuntimeException("La cuenta no tiene saldo definido");
+        }
+
+        if (cuenta.getSaldo() < monto) {
+            throw new RuntimeException("Saldo insuficiente");
+        }
+
+        cuenta.setSaldo(cuenta.getSaldo() - monto);
+        repo.save(cuenta);
+    }
 }
 

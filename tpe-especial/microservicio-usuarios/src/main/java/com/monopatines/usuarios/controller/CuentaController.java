@@ -57,6 +57,11 @@ public class CuentaController {
             @PathVariable Long idUsuario) {
         return service.asociarUsuario(idCuenta, idUsuario);
     }
+    @PutMapping("/{id}/debitar/{monto}")
+    public String debitar(@PathVariable Long id, @PathVariable double monto) {
+        service.debitarSaldo(id, monto);
+        return "Se debitó $" + monto + " de la cuenta " + id;
+    }
 
 }
 
