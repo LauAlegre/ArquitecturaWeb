@@ -2,8 +2,10 @@ package org.example.microservicioviajes.service;
 
 import org.example.microservicioviajes.client.EstadoClientViajes;
 import org.example.microservicioviajes.client.UsuarioClientViajes;
+import org.example.microservicioviajes.client.FacturaClientViajes;
 import org.example.microservicioviajes.dto.ViajeDTO;
 import org.example.microservicioviajes.dto.UsoDTO;
+import org.example.microservicioviajes.dto.DatosDeFacturacionDTO;
 import org.example.microservicioviajes.dto.ResumenViajeDTO;
 import org.example.microservicioviajes.mapper.ViajeMapper;
 import org.example.microservicioviajes.model.ViajeModel;
@@ -31,6 +33,7 @@ public class ViajeService {
     private final UsuarioClientViajes usuarioClient;
     private final EstadoClientViajes estadoClientViajes; // Inyección del cliente de estado
     private final PausaRepository pausaRepository;
+    private final FacturaClientViajes facturaClientViajes; // nuevo: cliente de facturación
 
     public ViajeDTO iniciarViaje(ViajeDTO dto) {
         if (dto.getMonopatinId() == null) {
@@ -116,7 +119,18 @@ public class ViajeService {
                     kmRecorridos != null ? kmRecorridos : null);
         }
 
-        return new ResumenViajeDTO(
+        // Enviar datos de facturación al MS de facturación
+        DatosDeFacturacionDTO datos = new DatosDeFacturacionDTO(
+                v.getCuentaId(),
+                v.getId(),
+                (int) minutosTotales,
+                (int) minutosPausas,
+                minutosPausas > 15, // pausa extensa si supera 15 min
+                LocalDate.now()
+        );
+        facturaClientViajes.generarFactura(datos);
+
+        return new DatosDeFacturacionDTO() (
                 v.getId(),
                 (int) minutosTotales,
                 (int) minutosPausas,
