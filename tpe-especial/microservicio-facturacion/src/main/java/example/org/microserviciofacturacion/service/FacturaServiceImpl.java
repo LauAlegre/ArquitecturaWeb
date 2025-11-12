@@ -29,6 +29,7 @@ public class FacturaServiceImpl implements FacturaService {
     @Transactional
     @Override
     public Factura generarFactura(FacturaDto dto) {
+
         if (dto.getIdCuenta() == null || dto.getIdViaje() == null)
             throw new IllegalArgumentException("idCuenta e idViaje son obligatorios");
         if (dto.getMinutos() <= 0)

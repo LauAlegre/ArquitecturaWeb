@@ -3,6 +3,7 @@ package com.monopatines.usuarios.service;
 import com.monopatines.usuarios.dto.CuentaDTO;
 import com.monopatines.usuarios.mapper.CuentaMapper;
 import com.monopatines.usuarios.model.Cuenta;
+import com.monopatines.usuarios.model.Rol;
 import com.monopatines.usuarios.model.Usuario;
 import com.monopatines.usuarios.repository.CuentaRepository;
 import com.monopatines.usuarios.repository.UsuarioRepository;
@@ -62,12 +63,24 @@ public class CuentaService {
     }
 
     // 🚫 Anular cuenta
-    public void anularCuenta(Long id) {
+    public void anularCuenta(Long id, Long idAdmin) {
+        Usuario admin = usuarioRepo.findById(idAdmin)
+                .orElseThrow(() -> new RuntimeException("Usuario administrador no encontrado"));
+
+        if(admin.getRol()!= Rol.ADMIN) {
+            throw new RuntimeException("El usuario no tiene permisos de administrador");
+        }
         repo.anularCuenta(id);
     }
 
     // ✅ Activar cuenta
-    public void activarCuenta(Long id) {
+    public void activarCuenta(Long id, Long idAdmin) {
+        Usuario admin = usuarioRepo.findById(idAdmin)
+                .orElseThrow(() -> new RuntimeException("Usuario administrador no encontrado"));
+
+        if(admin.getRol()!= Rol.ADMIN) {
+            throw new RuntimeException("El usuario no tiene permisos de administrador");
+        }
         repo.activarCuenta(id);
     }
 

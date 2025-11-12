@@ -34,3 +34,4 @@ public class ViajesClient {
         return restTemplate.getForObject(url, UsoCuentaDTO.class);
     }
 }
+

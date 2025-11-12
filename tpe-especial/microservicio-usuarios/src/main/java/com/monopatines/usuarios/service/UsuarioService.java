@@ -6,12 +6,15 @@ import com.monopatines.usuarios.dto.UsoCuentaDTO;
 import com.monopatines.usuarios.dto.UsuarioDTO;
 import com.monopatines.usuarios.mapper.UsuarioMapper;
 import com.monopatines.usuarios.model.Cuenta;
+import com.monopatines.usuarios.model.Rol;
+import com.monopatines.usuarios.model.TipoCuenta;
 import com.monopatines.usuarios.model.Usuario;
 import com.monopatines.usuarios.repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -70,39 +73,80 @@ public class UsuarioService {
      * Si incluirRelacionados = true, suma los viajes de todas las cuentas del usuario.
      * Si incluirRelacionados = false, solo los viajes del usuario específico.
      */
-    public UsoCuentaDTO obtenerUso(Long idUsuario, LocalDate desde, LocalDate hasta, boolean incluirRelacionados) {
+    public UsoCuentaDTO obtenerUso(Long idUsuario, LocalDate desde, LocalDate hasta, boolean incluirRelacionados, Long idSolicitante) {
+
+        // 1️⃣ Verificar permisos
+        verificarPermisosAdmin(idSolicitante);
+
+        // 2️⃣ Buscar usuario objetivo
         Usuario usuario = repo.findById(idUsuario)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con id: " + idUsuario));
 
         double totalKm = 0;
         double totalMin = 0;
         int totalViajes = 0;
 
         if (incluirRelacionados) {
-            // 🔹 Buscar todas las cuentas del usuario y traer los viajes por cuenta
+            // 🔹 Buscar todas las cuentas del usuario
             List<Cuenta> cuentas = usuario.getCuentas();
-            if (cuentas.isEmpty()) {
+            if (cuentas == null || cuentas.isEmpty()) {
                 throw new RuntimeException("El usuario no tiene cuentas asociadas");
             }
 
-            for (Cuenta cuenta : cuentas) {
-                UsoCuentaDTO usoCuenta = viajesClient.obtenerUsoPorCuenta(cuenta.getId(), desde, hasta);
-                if (usoCuenta != null) {
-                    totalKm += usoCuenta.getKmTotales();
-                    totalMin += usoCuenta.getTiempoTotal();
-                    totalViajes += usoCuenta.getCantidadViajes();
-                }
-            }
-        } else {
-            // 🔹 Solo el uso personal (por idUsuario)
-            UsoCuentaDTO usoPersonal = viajesClient.obtenerUsoPorUsuario(usuario.getId(), desde, hasta);
-            if (usoPersonal != null) {
-                totalKm += usoPersonal.getKmTotales();
-                totalMin += usoPersonal.getTiempoTotal();
-                totalViajes += usoPersonal.getCantidadViajes();
-            }
-        }
+            // 🔹 Sumar los usos de todas las cuentas
+            List<UsoCuentaDTO> usos = cuentas.stream()
+                    .map(c -> viajesClient.obtenerUsoPorCuenta(c.getId(), desde, hasta))
+                    .filter(Objects::nonNull)
+                    .toList();
 
-        return new UsoCuentaDTO(null, totalKm, totalMin, totalViajes);
+            totalKm = usos.stream().mapToDouble(UsoCuentaDTO::getKmTotales).sum();
+            totalMin = usos.stream().mapToDouble(UsoCuentaDTO::getTiempoTotal).sum();
+            totalViajes = usos.stream().mapToInt(UsoCuentaDTO::getCantidadViajes).sum();
+
+            // Devuelve como agregado total
+            return new UsoCuentaDTO(null,"Agregado" ,totalKm, totalMin, totalViajes);
+
+        } else {
+            // 🔹 Solo uso personal (por usuario)
+            UsoCuentaDTO usoPersonal = viajesClient.obtenerUsoPorUsuario(usuario.getId(), desde, hasta);
+
+            if (usoPersonal == null) {
+                throw new RuntimeException("No se encontró información de uso para el usuario con id: " + idUsuario);
+            }
+
+            return new UsoCuentaDTO(
+                    usuario.getId(),
+                    "Usuario",
+                    usoPersonal.getKmTotales(),
+                    usoPersonal.getTiempoTotal(),
+                    usoPersonal.getCantidadViajes()
+            );
+        }
     }
+
+    /**
+     * Verifica que el solicitante tenga rol ADMIN.
+     */
+    private void verificarPermisosAdmin(Long idSolicitante) {
+        Usuario solicitante = repo.findById(idSolicitante)
+                .orElseThrow(() -> new RuntimeException("Usuario solicitante no encontrado con id: " + idSolicitante));
+
+        if (solicitante.getRol() != Rol.ADMIN) {
+            throw new RuntimeException("No tiene permisos para ver el uso de otros usuarios");
+        }
+    }
+
+    public boolean esAdmin(Long idUsuario) {
+        Usuario usuario = repo.findById(idUsuario)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con id: " + idUsuario));
+
+        // Supone que Usuario tiene un atributo 'rol' o 'tipoUsuario'
+        // Por ejemplo: "ADMIN" o "USER"
+        return usuario.getRol() == Rol.ADMIN;
+    }
+
+    public List<Long> obtenerUsuariosPorTipoCuenta(String tipoCuenta) {
+        return repo.findIdsByTipoCuenta(TipoCuenta.valueOf(tipoCuenta.toUpperCase()));
+    }
+
 }

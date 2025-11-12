@@ -43,12 +43,22 @@ public class UsuarioController {
         service.eliminar(id);
     }
 
-    @GetMapping("/{id}/uso")
-    public UsoCuentaDTO obtenerUso(@PathVariable Long id,
+    @GetMapping("/{id}/uso/{idUsuario}")
+    public UsoCuentaDTO obtenerUso(@PathVariable Long idUsuario,@PathVariable Long id,
                                    @RequestParam LocalDate desde,
                                    @RequestParam LocalDate hasta,
                                    @RequestParam(defaultValue = "false") boolean incluirRelacionados) {
-        return service.obtenerUso(id, desde, hasta, incluirRelacionados);
+        return service.obtenerUso(id, desde, hasta, incluirRelacionados, idUsuario);
+    }
+    // ✅ Nuevo endpoint: verificar si un usuario es admin
+    @GetMapping("/{id}/es-admin")
+    public boolean esAdmin(@PathVariable Long id) {
+        return service.esAdmin(id);
+    }
+
+    @GetMapping("/por-tipo-cuenta")
+    public List<Long> obtenerUsuariosPorTipoCuenta(@RequestParam String tipoCuenta) {
+        return service.obtenerUsuariosPorTipoCuenta(tipoCuenta);
     }
 
 }

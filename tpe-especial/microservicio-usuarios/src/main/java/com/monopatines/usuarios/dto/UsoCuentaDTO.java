@@ -10,7 +10,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UsoCuentaDTO {
-    private Long idCuenta;
+    private Long idReferencia;
+    private String tipoReferencia;
     private Double kmTotales;
     private Double tiempoTotal;
     private Integer cantidadViajes;
