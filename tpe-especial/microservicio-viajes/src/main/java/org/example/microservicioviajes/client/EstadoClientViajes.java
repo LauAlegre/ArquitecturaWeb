@@ -17,7 +17,7 @@ public class EstadoClientViajes {
         }
 
         String url = UriComponentsBuilder
-                .fromHttpUrl("http://localhost:8080/monopatines/{id}/estado")
+                .fromHttpUrl("http://localhost:8083/monopatines/{id}/estado")
                 .queryParam("estado", estado)
                 .buildAndExpand(monopatinId)
                 .toUriString();
@@ -31,7 +31,7 @@ public class EstadoClientViajes {
             throw new IllegalArgumentException("monopatinId es obligatorio");
         }
         UriComponents builder = UriComponentsBuilder
-                .fromHttpUrl("http://localhost:8080/monopatines/{id}/finalizar")
+                .fromHttpUrl("http://localhost:8083/monopatines/{id}/finalizar")
                 .buildAndExpand(monopatinId);
         String url = kmRecorridos == null
                 ? builder.toUriString()

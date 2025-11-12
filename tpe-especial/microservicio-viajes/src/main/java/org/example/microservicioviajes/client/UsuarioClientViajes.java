@@ -30,7 +30,7 @@ public class UsuarioClientViajes {
     // de usuarios.
     public List<Long> obtenerIdsUsuariosPorTipo(String tipoCuenta) {
         String url = UriComponentsBuilder
-                .fromHttpUrl("http://localhost:8082/usuarios/por-tipo-cuenta")
+                .fromHttpUrl("http://localhost:8080/usuarios/por-tipo-cuenta")
                 .queryParam("tipoCuenta", tipoCuenta)
                 .toUriString();
 
