@@ -48,6 +48,12 @@ public class MonopatinController {
         return service.cambiarEstado(id, estado);
     }
 
+    @PutMapping("/{id}/finalizar")
+    public MonopatinDTO finalizar(@PathVariable Long id,
+            @RequestParam("kmRecorridos") Double kmRecorridos) {
+        return service.finalizarViaje(id, kmRecorridos);
+    }
+
     @PutMapping("/{id}/ubicacion")
     public MonopatinDTO actualizarUbicacion(@PathVariable Long id,
             @RequestParam Double latitud,
@@ -72,4 +78,5 @@ public class MonopatinController {
             @RequestParam("usuarioId") Long usuarioId) {
         return service.generarReporteKm(incluirPausas, usuarioId);
     }
+
 }

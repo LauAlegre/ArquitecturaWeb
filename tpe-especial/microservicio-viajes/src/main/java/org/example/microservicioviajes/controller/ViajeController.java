@@ -1,5 +1,6 @@
 package org.example.microservicioviajes.controller;
 
+import org.example.microservicioviajes.dto.ResumenViajeDTO;
 import org.example.microservicioviajes.dto.UsoDTO;
 import org.example.microservicioviajes.dto.ViajeDTO;
 import org.example.microservicioviajes.repository.ViajeRepository;
@@ -8,7 +9,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -33,9 +33,9 @@ public class ViajeController {
         return service.obtenerPorId(id);
     }
 
-    @PostMapping
-    public ViajeDTO crear(@RequestBody ViajeDTO dto) {
-        return service.crear(dto);
+    @PostMapping("/iniciar")
+    public ViajeDTO iniciarViaje(@RequestBody ViajeDTO dto) {
+        return service.iniciarViaje(dto);
     }
 
     @PutMapping("/{id}")
@@ -48,10 +48,10 @@ public class ViajeController {
         service.eliminar(id);
     }
 
-    // Cerrar viaje (fecha fin ahora, km como parámetro)
+    // Cerrar viaje (devuelve resumen)
     @PutMapping("/{id}/cerrar")
-    public ViajeDTO cerrarViaje(@PathVariable("id") Long viajeId,
-            @RequestParam("kmRecorridos") BigDecimal kmRecorridos) {
+    public ResumenViajeDTO cerrarViaje(@PathVariable("id") Long viajeId,
+            @RequestParam("kmRecorridos") Double kmRecorridos) {
         return service.cerrarViaje(viajeId, java.time.LocalDateTime.now(), kmRecorridos);
     }
 

@@ -1,18 +1,20 @@
 package org.example.microservicioviajes.service;
 
+import org.example.microservicioviajes.client.EstadoClientViajes;
 import org.example.microservicioviajes.client.UsuarioClientViajes;
 import org.example.microservicioviajes.dto.ViajeDTO;
 import org.example.microservicioviajes.dto.UsoDTO;
+import org.example.microservicioviajes.dto.ResumenViajeDTO;
 import org.example.microservicioviajes.mapper.ViajeMapper;
 import org.example.microservicioviajes.model.ViajeModel;
 import org.example.microservicioviajes.repository.ViajeRepository;
+import org.example.microservicioviajes.repository.PausaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -27,11 +29,23 @@ public class ViajeService {
     private final ViajeRepository viajeRepository;
     private final ViajeMapper viajeMapper;
     private final UsuarioClientViajes usuarioClient;
+    private final EstadoClientViajes estadoClientViajes; // Inyección del cliente de estado
+    private final PausaRepository pausaRepository;
 
-    public ViajeDTO crear(ViajeDTO dto) {
-        ViajeModel entity = viajeMapper.toEntity(dto);
-        ViajeModel saved = viajeRepository.save(entity);
-        return viajeMapper.toDTO(saved);
+    public ViajeDTO iniciarViaje(ViajeDTO dto) {
+        if (dto.getMonopatinId() == null) {
+            throw new IllegalArgumentException("monopatinId requerido");
+        }
+
+        // Cambiar estado del monopatín a EN_USO
+        estadoClientViajes.cambiarEstado(dto.getMonopatinId(), "EN_USO");
+
+        ViajeModel model = viajeMapper.toEntity(dto);
+        model.setFechaInicio(java.time.LocalDateTime.now());
+        model.setFechaFin(null);
+        model.setKmRecorridos(null); // o BigDecimal.ZERO si prefieres valor numérico
+        ViajeModel guardado = viajeRepository.save(model);
+        return viajeMapper.toDTO(guardado);
     }
 
     @Transactional(readOnly = true)
@@ -74,16 +88,39 @@ public class ViajeService {
      * ======================
      */
 
-    /** Cierra un viaje (setea fecha_fin y km_recorridos). */
-    public ViajeDTO cerrarViaje(Long id, LocalDateTime fechaFin, BigDecimal kmRecorridos) {
+    /** Cierra un viaje y devuelve resumen. */
+    public ResumenViajeDTO cerrarViaje(Long id, LocalDateTime fechaFin, Double kmRecorridos) {
         ViajeModel v = viajeRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Viaje no encontrado id=" + id));
         if (v.getFechaFin() != null) {
             throw new IllegalStateException("El viaje ya está cerrado");
         }
-        v.setFechaFin(fechaFin);
+
+        LocalDateTime finCalculado = (fechaFin != null) ? fechaFin : LocalDateTime.now();
+        v.setFechaFin(finCalculado);
         v.setKmRecorridos(kmRecorridos);
-        return viajeMapper.toDTO(viajeRepository.save(v));
+
+        long minutosTotales = 0L;
+        if (v.getFechaInicio() != null) {
+            minutosTotales = Duration.between(v.getFechaInicio(), finCalculado).toMinutes();
+        }
+
+        long minutosPausas = java.util.Optional.ofNullable(
+                pausaRepository.sumDuracionMinutosByViajeId(v.getId())).orElse(0L);
+
+        viajeRepository.save(v);
+
+        if (v.getMonopatinId() != null) {
+            estadoClientViajes.finalizarMonopatin(
+                    v.getMonopatinId(),
+                    kmRecorridos != null ? kmRecorridos : null);
+        }
+
+        return new ResumenViajeDTO(
+                v.getId(),
+                (int) minutosTotales,
+                (int) minutosPausas,
+                kmRecorridos != null ? kmRecorridos : 0d);
     }
 
     /**

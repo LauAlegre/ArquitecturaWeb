@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +29,7 @@ public class ViajeModel {
     private LocalDateTime fechaFin;
 
     @Column(name = "km_recorridos")
-    private BigDecimal kmRecorridos;
+    private Double kmRecorridos;
 
     @Column(name = "id_cuenta")
     private Long cuentaId;

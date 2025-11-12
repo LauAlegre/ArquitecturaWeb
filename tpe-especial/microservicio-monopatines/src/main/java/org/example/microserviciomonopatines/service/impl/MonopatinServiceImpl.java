@@ -150,6 +150,25 @@ public class MonopatinServiceImpl implements MonopatinService {
         }
     }
 
+    @Override
+    public MonopatinDTO finalizarViaje(Long id, Double kmRecorridos) {
+        var modelo = repository.findById(id)
+                .orElseThrow(() -> new java.util.NoSuchElementException("Monopatín no encontrado id=" + id));
+
+        // Sumar kilómetros
+        if (kmRecorridos != null) {
+            var total = java.util.Optional.ofNullable(modelo.getTotalKm())
+                    .orElse(0.0);
+            modelo.setTotalKm(total + kmRecorridos);
+        }
+
+        // Cambiar estado a DISPONIBLE usando el enum correcto
+        modelo.setEstado(EstadoMonopatin.DISPONIBLE);
+
+        var guardado = repository.save(modelo);
+        return mapper.toDTO(guardado);
+    }
+
     private EstadoMonopatin parseEstado(String raw) {
         if (raw == null)
             return null;
