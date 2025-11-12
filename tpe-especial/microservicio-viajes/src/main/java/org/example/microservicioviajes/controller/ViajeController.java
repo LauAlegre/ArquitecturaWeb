@@ -51,7 +51,7 @@ public class ViajeController {
     // Cerrar viaje (fecha fin ahora, km como parámetro)
     @PutMapping("/{id}/cerrar")
     public ViajeDTO cerrarViaje(@PathVariable("id") Long viajeId,
-                                @RequestParam("kmRecorridos") BigDecimal kmRecorridos) {
+            @RequestParam("kmRecorridos") BigDecimal kmRecorridos) {
         return service.cerrarViaje(viajeId, java.time.LocalDateTime.now(), kmRecorridos);
     }
 
@@ -68,42 +68,36 @@ public class ViajeController {
 
     @GetMapping("/reporte/monopatines-mas-viajes")
     public List<ViajeRepository.MonopatinViajesCount> monopatinesMasViajes(@RequestParam int anio,
-                                                                           @RequestParam long minViajes) {
-        return service.monopatinesConMasDeXViajes(anio, minViajes);
-    }
-
-    @GetMapping("/uso-usuarios")
-    public List<ViajeRepository.UsoUsuario> rankingUsuarios(@RequestParam LocalDate desde,
-                                                            @RequestParam LocalDate hasta,
-                                                            @RequestParam(defaultValue = "0") int limite) {
-        return service.usuariosMasActivos(desde, hasta, limite);
+            @RequestParam long minViajes,
+            @RequestParam Long usuarioAdminId) {
+        return service.monopatinesConMasDeXViajes(anio, minViajes, usuarioAdminId);
     }
 
     @GetMapping("/uso-cuenta/{idCuenta}")
     public UsoDTO usoPorCuentaDTO(@PathVariable Long idCuenta,
-                                  @RequestParam
-                                  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
-                                  @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta) {
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta) {
         return service.usoPorCuenta(idCuenta, desde, hasta);
     }
 
     @GetMapping("/uso-usuario/{idUsuario}")
     public UsoDTO usoPorUsuarioDTO(@PathVariable Long idUsuario,
-                                   @RequestParam
-                                   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
-                                   @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta) {
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta) {
         return service.usoPorUsuario(idUsuario, desde, hasta);
     }
 
-    // Ranking de usuarios por tipo. Pasar usuarioIds del tipo desde el microservicio de usuarios.
-    // Ejemplo: /uso-usuarios-por-tipo?desde=2025-01-01&hasta=2025-01-31&tipoUsuario=PREMIUM&usuarioIds=1&usuarioIds=2&limite=10
+    // Ranking de usuarios por tipo. Ahora se pasa el usuarioAdminId (debe ser
+    // admin).
+    // Ejemplo:
+    // /uso-usuarios-por-tipo?desde=2025-01-01&hasta=2025-01-31&tipoUsuario=PREMIUM&usuarioAdminId=1&limite=10
     @GetMapping("/uso-usuarios-por-tipo")
     public List<ViajeRepository.UsoUsuario> rankingUsuariosPorTipo(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta,
             @RequestParam String tipoUsuario,
-            @RequestParam(name = "usuarioIds") List<Long> usuarioIdsDelTipo,
+            @RequestParam Long usuarioAdminId,
             @RequestParam(defaultValue = "0") int limite) {
-        return service.usuariosMasActivosPorTipo(desde, hasta, tipoUsuario, usuarioIdsDelTipo, limite);
+        return service.usuariosMasActivosPorTipo(desde, hasta, tipoUsuario, usuarioAdminId, limite);
     }
 }

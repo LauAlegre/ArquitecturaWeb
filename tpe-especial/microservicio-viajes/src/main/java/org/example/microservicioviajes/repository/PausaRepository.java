@@ -10,9 +10,4 @@ import java.util.Optional;
 @Repository
 public interface PausaRepository extends JpaRepository<PausaModel, Long> {
 
-    boolean existsByViajeIdAndFechaFinIsNull(Long viajeId);
-
-    List<PausaModel> findByViajeId(Long viajeId);
-
-    Optional<PausaModel> findFirstByViajeIdAndFechaFinIsNullOrderByFechaInicioDesc(Long viajeId);
 }

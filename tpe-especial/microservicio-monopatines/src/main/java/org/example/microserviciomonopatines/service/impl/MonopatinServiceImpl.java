@@ -1,14 +1,15 @@
 package org.example.microserviciomonopatines.service.impl;
 
+import org.example.microserviciomonopatines.client.UsuarioClientMonopatines;
 import org.example.microserviciomonopatines.dto.MonopatinDTO;
 import org.example.microserviciomonopatines.dto.MonopatinReporteDTO;
 import org.example.microserviciomonopatines.model.EstadoMonopatin;
-import org.example.microserviciomonopatines.model.Monopatin;
 import org.example.microserviciomonopatines.repository.MonopatinRepository;
 import org.example.microserviciomonopatines.service.GeoService;
 import org.example.microserviciomonopatines.service.MonopatinService;
 import org.springframework.stereotype.Service;
 import org.example.microserviciomonopatines.mapper.MonopatinMapper;
+import org.example.microserviciomonopatines.model.Monopatin;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -19,11 +20,14 @@ public class MonopatinServiceImpl implements MonopatinService {
     private final MonopatinRepository repository;
     private final GeoService geoService;
     private final MonopatinMapper mapper;
+    private final UsuarioClientMonopatines usuarioClient;
 
-    public MonopatinServiceImpl(MonopatinRepository repository, GeoService geoService, MonopatinMapper mapper) {
+    public MonopatinServiceImpl(MonopatinRepository repository, GeoService geoService, MonopatinMapper mapper,
+            UsuarioClientMonopatines usuarioClient) {
         this.repository = repository;
         this.geoService = geoService;
         this.mapper = mapper;
+        this.usuarioClient = usuarioClient;
     }
 
     @Override
@@ -71,12 +75,11 @@ public class MonopatinServiceImpl implements MonopatinService {
 
     @Override
     public MonopatinDTO cambiarEstado(Long id, String estado) {
-        Monopatin monopatin = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Monopatín no encontrado con id " + id));
-
-        monopatin.setEstado(parseEstado(estado)); // <- enum
-        Monopatin actualizado = repository.save(monopatin);
-        return mapper.toDTO(actualizado);
+        EstadoMonopatin e = parseEstado(estado);
+        int rows = repository.updateEstadoById(id, e);
+        if (rows == 0)
+            throw new RuntimeException("Monopatín no encontrado con id " + id);
+        return buscarPorId(id);
     }
 
     @Override
@@ -99,28 +102,18 @@ public class MonopatinServiceImpl implements MonopatinService {
 
     @Override
     public MonopatinDTO actualizarUbicacion(Long id, Double latitud, Double longitud) {
-        Monopatin monopatin = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Monopatín no encontrado con id " + id));
-
-        monopatin.setLatitud(latitud);
-        monopatin.setLongitud(longitud);
-        Monopatin actualizado = repository.save(monopatin);
-        return mapper.toDTO(actualizado);
+        int rows = repository.updateUbicacionById(id, latitud, longitud);
+        if (rows == 0)
+            throw new RuntimeException("Monopatín no encontrado con id " + id);
+        return buscarPorId(id);
     }
 
     @Override
     public Map<String, Long> obtenerDisponibilidad() {
-        List<Monopatin> todos = repository.findAll();
-
-        long enMantenimiento = todos.stream()
-                .filter(m -> m.getEstado() == EstadoMonopatin.EN_MANTENIMIENTO) // <- comparar enums
-                .count();
-
-        long dadosDeBaja = todos.stream()
-                .filter(m -> m.getEstado() == EstadoMonopatin.DADO_DE_BAJA)
-                .count();
-
-        long enOperacion = todos.size() - enMantenimiento - dadosDeBaja;
+        long enMantenimiento = repository.countByEstado(EstadoMonopatin.EN_MANTENIMIENTO);
+        long dadosDeBaja = repository.countByEstado(EstadoMonopatin.DADO_DE_BAJA);
+        long total = repository.count();
+        long enOperacion = total - enMantenimiento - dadosDeBaja;
 
         Map<String, Long> resultado = new HashMap<>();
         resultado.put("enOperacion", enOperacion);
@@ -131,32 +124,30 @@ public class MonopatinServiceImpl implements MonopatinService {
 
     @Override
     public List<MonopatinDTO> listarCercanos(Double lat, Double lon, Double radio) {
-        return repository.findAll()
+        return repository.findWithinRadius(lat, lon, radio)
                 .stream()
-                .filter(m -> geoService.withinRadius(lat, lon, m.getLatitud(), m.getLongitud(), radio))
                 .map(mapper::toDTO)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<MonopatinReporteDTO> generarReporteKm(boolean incluirPausas) {
-        List<Monopatin> monopatines = repository.findAll();
+    public List<MonopatinReporteDTO> generarReporteKm(Boolean incluirPausas, Long usuarioId) {
+        if (usuarioId == null) {
+            throw new RuntimeException("usuarioId requerido");
+        }
 
-        return monopatines.stream().map(m -> {
-            double km = m.getTotalKm() != null ? m.getTotalKm() : 0.0;
-            double tiempo = incluirPausas && m.getTotalTiempoUso() != null
-                    ? m.getTotalTiempoUso()
-                    : 0.0;
+        Boolean esAdmin = usuarioClient.esAdmin(usuarioId);
+        if (esAdmin == null || !esAdmin) {
+            throw new RuntimeException("Usuario no autorizado");
+        }
 
-            boolean requiereMantenimiento = km >= 1000 || tiempo >= 500;
-            // 🔧 criterio de mantenimiento de ejemplo
-
-            return new MonopatinReporteDTO(
-                    m.getId(),
-                    km,
-                    tiempo,
-                    requiereMantenimiento);
-        }).collect(Collectors.toList());
+        // si el flag es null usamos la query sin parámetro (comportamiento por defecto
+        // del repository)
+        if (incluirPausas == null) {
+            return repository.generarReporteKm();
+        } else {
+            return repository.generarReporteKm(incluirPausas);
+        }
     }
 
     private EstadoMonopatin parseEstado(String raw) {

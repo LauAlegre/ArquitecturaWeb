@@ -1,5 +1,6 @@
 package org.example.microservicioviajes.service;
 
+import org.example.microservicioviajes.client.UsuarioClientViajes;
 import org.example.microservicioviajes.dto.ViajeDTO;
 import org.example.microservicioviajes.dto.UsoDTO;
 import org.example.microservicioviajes.mapper.ViajeMapper;
@@ -25,6 +26,7 @@ import java.util.Objects;
 public class ViajeService {
     private final ViajeRepository viajeRepository;
     private final ViajeMapper viajeMapper;
+    private final UsuarioClientViajes usuarioClient;
 
     public ViajeDTO crear(ViajeDTO dto) {
         ViajeModel entity = viajeMapper.toEntity(dto);
@@ -66,9 +68,11 @@ public class ViajeService {
         viajeRepository.deleteById(id);
     }
 
-    /* ======================
-       Reglas/operaciones de negocio
-       ====================== */
+    /*
+     * ======================
+     * Reglas/operaciones de negocio
+     * ======================
+     */
 
     /** Cierra un viaje (setea fecha_fin y km_recorridos). */
     public ViajeDTO cerrarViaje(Long id, LocalDateTime fechaFin, BigDecimal kmRecorridos) {
@@ -82,22 +86,17 @@ public class ViajeService {
         return viajeMapper.toDTO(viajeRepository.save(v));
     }
 
-    /** Reporte: monopatines con más de X viajes en un año. */
+    /**
+     * Reporte: monopatines con más de X viajes en un año (requiere usuario admin).
+     */
     @Transactional(readOnly = true)
-    public List<ViajeRepository.MonopatinViajesCount> monopatinesConMasDeXViajes(int anio, long minViajes) {
-        return viajeRepository.findMonopatinesConMasDeXViajesEnAnio(anio, minViajes);
-    }
-
-    /* ===== Uso por usuario (ranking filtrado por período y tipoUsuario) ===== */
-    @Transactional(readOnly = true)
-    public List<ViajeRepository.UsoUsuario> usuariosMasActivos(LocalDate desde, LocalDate hasta, int limite) {
-        LocalDateTime inicio = desde.atStartOfDay();
-        LocalDateTime fin = hasta.plusDays(1).atStartOfDay();
-        List<ViajeRepository.UsoUsuario> lista = viajeRepository.findUsoUsuariosPeriodo(inicio, fin);
-        if (limite > 0 && lista.size() > limite) {
-            return lista.subList(0, limite);
+    public List<ViajeRepository.MonopatinViajesCount> monopatinesConMasDeXViajes(int anio, long minViajes,
+            Long usuarioAdminId) {
+        // validar admin
+        if (usuarioAdminId == null || !usuarioClient.esAdmin(usuarioAdminId)) {
+            throw new SecurityException("Acceso denegado: se requiere usuario admin.");
         }
-        return lista;
+        return viajeRepository.findMonopatinesConMasDeXViajesEnAnio(anio, minViajes);
     }
 
     // Nuevo: uso por cuenta con período
@@ -114,12 +113,16 @@ public class ViajeService {
         int cantidad = 0;
 
         for (ViajeModel v : viajeRepository.findAll()) {
-            if (!Objects.equals(v.getCuentaId(), cuentaId)) continue;
-            if (v.getFechaInicio() == null || v.getFechaFin() == null) continue; // solo cerrados
-            if (v.getFechaInicio().isBefore(inicio) || !v.getFechaInicio().isBefore(finExclusivo)) continue;
+            if (!Objects.equals(v.getCuentaId(), cuentaId))
+                continue;
+            if (v.getFechaInicio() == null || v.getFechaFin() == null)
+                continue; // solo cerrados
+            if (v.getFechaInicio().isBefore(inicio) || !v.getFechaInicio().isBefore(finExclusivo))
+                continue;
 
             cantidad++;
-            if (v.getKmRecorridos() != null) kmTotales += v.getKmRecorridos().doubleValue();
+            if (v.getKmRecorridos() != null)
+                kmTotales += v.getKmRecorridos().doubleValue();
             minutosTotales += Duration.between(v.getFechaInicio(), v.getFechaFin()).toMinutes();
         }
         return new UsoDTO(cuentaId, kmTotales, minutosTotales, cantidad);
@@ -138,36 +141,52 @@ public class ViajeService {
         int cantidad = 0;
 
         for (ViajeModel v : viajeRepository.findAll()) {
-            if (!Objects.equals(v.getUsuarioId(), usuarioId)) continue;
-            if (v.getFechaInicio() == null || v.getFechaFin() == null) continue; // solo cerrados
-            if (v.getFechaInicio().isBefore(inicio) || !v.getFechaInicio().isBefore(finExclusivo)) continue;
+            if (!Objects.equals(v.getUsuarioId(), usuarioId))
+                continue;
+            if (v.getFechaInicio() == null || v.getFechaFin() == null)
+                continue; // solo cerrados
+            if (v.getFechaInicio().isBefore(inicio) || !v.getFechaInicio().isBefore(finExclusivo))
+                continue;
 
             cantidad++;
-            if (v.getKmRecorridos() != null) kmTotales += v.getKmRecorridos().doubleValue();
+            if (v.getKmRecorridos() != null)
+                kmTotales += v.getKmRecorridos().doubleValue();
             minutosTotales += Duration.between(v.getFechaInicio(), v.getFechaFin()).toMinutes();
         }
         return new UsoDTO(usuarioId, kmTotales, minutosTotales, cantidad);
     }
 
-    /* Ranking de usuarios por uso filtrado por período y tipo de usuario.
-       NOTA: usuarioIdsDelTipo debe venir del microservicio de usuarios según el tipo solicitado. */
+    /*
+     * Ranking de usuarios por uso filtrado por período y tipo de usuario.
+     * Ahora: obtiene los usuarioIds del microservicio de usuarios y valida que
+     * quien solicita es admin.
+     */
     @Transactional(readOnly = true)
     public List<ViajeRepository.UsoUsuario> usuariosMasActivosPorTipo(LocalDate desde,
-                                                                       LocalDate hasta,
-                                                                       String tipoUsuario,
-                                                                       List<Long> usuarioIdsDelTipo,
-                                                                       int limite) {
+            LocalDate hasta,
+            String tipoUsuario,
+            Long usuarioAdminId,
+            int limite) {
         if (desde.isAfter(hasta)) {
             throw new IllegalArgumentException("El parámetro 'desde' no puede ser posterior a 'hasta'.");
         }
+
+        // Validar admin
+        if (usuarioAdminId == null || !usuarioClient.esAdmin(usuarioAdminId)) {
+            throw new SecurityException("Acceso denegado: se requiere usuario admin.");
+        }
+
+        // Obtener ids de usuarios del tipo desde el microservicio de usuarios
+        List<Long> usuarioIdsDelTipo = usuarioClient.obtenerIdsUsuariosPorTipo(tipoUsuario);
         if (usuarioIdsDelTipo == null || usuarioIdsDelTipo.isEmpty()) {
             return List.of(); // No hay usuarios del tipo => no hay ranking
         }
+
         LocalDateTime inicio = desde.atStartOfDay();
         LocalDateTime fin = hasta.plusDays(1).atStartOfDay();
 
-        List<ViajeRepository.UsoUsuario> lista =
-                viajeRepository.findUsoUsuariosPeriodoPorIds(inicio, fin, usuarioIdsDelTipo);
+        List<ViajeRepository.UsoUsuario> lista = viajeRepository.findUsoUsuariosPeriodoPorIds(inicio, fin,
+                usuarioIdsDelTipo);
 
         if (limite > 0 && lista.size() > limite) {
             return lista.subList(0, limite);

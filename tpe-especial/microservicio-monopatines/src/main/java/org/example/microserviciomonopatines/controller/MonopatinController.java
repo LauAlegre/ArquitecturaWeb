@@ -68,7 +68,8 @@ public class MonopatinController {
     }
 
     @GetMapping("/reporte/km")
-    public List<MonopatinReporteDTO> generarReporteKm(@RequestParam(defaultValue = "false") boolean incluirPausas) {
-        return service.generarReporteKm(incluirPausas);
+    public List<MonopatinReporteDTO> generarReporteKm(@RequestParam(defaultValue = "false") boolean incluirPausas,
+            @RequestParam("usuarioId") Long usuarioId) {
+        return service.generarReporteKm(incluirPausas, usuarioId);
     }
 }

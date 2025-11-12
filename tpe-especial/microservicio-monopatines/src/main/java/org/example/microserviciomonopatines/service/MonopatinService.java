@@ -32,5 +32,5 @@ public interface MonopatinService {
 
     Map<String, Long> obtenerDisponibilidad();
 
-    List<MonopatinReporteDTO> generarReporteKm(boolean incluirPausas);
+    List<MonopatinReporteDTO> generarReporteKm(Boolean incluirPausas, Long usuarioId);
 }

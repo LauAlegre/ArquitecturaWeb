@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 public class MonopatinReporteDTO {
     private Long id;
     private Double totalKm;
-    private Double totalTiempoUso; // opcional, si se incluyen pausas
-    private boolean requiereMantenimiento;
+    private Long totalTiempoUso;
+    private Boolean requiereMantenimiento;
 }

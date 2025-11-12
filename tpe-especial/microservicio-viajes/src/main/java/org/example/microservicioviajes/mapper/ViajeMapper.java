@@ -7,7 +7,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class ViajeMapper {
     public ViajeDTO toDTO(ViajeModel v) {
-        if (v == null) return null;
+        if (v == null)
+            return null;
         ViajeDTO dto = new ViajeDTO();
         dto.setId(v.getId());
         dto.setFechaInicio(v.getFechaInicio());
@@ -18,13 +19,15 @@ public class ViajeMapper {
         dto.setUsuarioId(v.getUsuarioId());
         return dto;
     }
+
     public ViajeModel toEntity(ViajeDTO dto) {
-        if (dto == null) return null;
+        if (dto == null)
+            return null;
         ViajeModel v = new ViajeModel();
         v.setId(dto.getId());
         v.setFechaInicio(dto.getFechaInicio());
-        v.setFechaFin(dto.getFechaFin());
-        v.setKmRecorridos(dto.getKmRecorridos());
+        v.setFechaFin(null);
+        v.setKmRecorridos(null);
         v.setCuentaId(dto.getCuentaId());
         v.setMonopatinId(dto.getMonopatinId());
         v.setUsuarioId(dto.getUsuarioId());
