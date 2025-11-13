@@ -16,10 +16,11 @@ public  interface TarifaService {
     /** Crea un ajuste a partir de la fecha indicada en el DTO.
      *  Si había una tarifa vigente, la "cierra" el día anterior para evitar solapes.
      */
-    Tarifa crearAjuste(TarifaDto dto);
+    Tarifa crearAjuste(TarifaDto dto, Long id);
 
 
     /** Historial completo ordenado por inicio de vigencia descendente. */
     List<Tarifa> historial();
+    void eliminarTarifa(Long id);
 
 }

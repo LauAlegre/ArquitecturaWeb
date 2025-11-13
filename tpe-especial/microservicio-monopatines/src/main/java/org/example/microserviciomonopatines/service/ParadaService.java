@@ -9,9 +9,9 @@ public interface ParadaService {
 
     ParadaDTO buscarPorId(Long id);
 
-    ParadaDTO crear(ParadaDTO dto);
+    ParadaDTO crear(ParadaDTO dto, Long idAdmin);
 
     ParadaDTO actualizar(Long id, ParadaDTO dto);
 
-    void eliminar(Long id);
+    void eliminar(Long id, Long idAdmin);
 }

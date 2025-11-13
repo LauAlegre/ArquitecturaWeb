@@ -22,6 +22,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -94,44 +95,54 @@ public class ViajeService {
     public DatosDeFacturacionDTO cerrarViaje(Long id, LocalDateTime fechaFin, Double kmRecorridos) {
         ViajeModel v = viajeRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Viaje no encontrado id=" + id));
+
         if (v.getFechaFin() != null) {
             throw new IllegalStateException("El viaje ya está cerrado");
         }
 
+        // Fecha fin real
         LocalDateTime finCalculado = (fechaFin != null) ? fechaFin : LocalDateTime.now();
         v.setFechaFin(finCalculado);
         v.setKmRecorridos(kmRecorridos);
 
+        // --- CALCULAR MINUTOS TOTALES ---
         long minutosTotales = 0L;
         if (v.getFechaInicio() != null) {
             minutosTotales = Duration.between(v.getFechaInicio(), finCalculado).toMinutes();
         }
 
+        // --- CALCULAR MINUTOS DE PAUSA ---
+        long minutosPausas = Optional.ofNullable(
+                pausaRepository.sumDuracionMinutosByViajeId(v.getId())
+        ).orElse(0L);
 
-        long minutosPausas = java.util.Optional.ofNullable(
-                pausaRepository.sumDuracionMinutosByViajeId(v.getId())).orElse(0L);
-
+        // Guardar viaje cerrado
         viajeRepository.save(v);
 
+        // --- ENVIAR ACTUALIZACIÓN AL MICROSERVICIO MONOPATINES ---
         if (v.getMonopatinId() != null) {
             estadoClientViajes.finalizarMonopatin(
                     v.getMonopatinId(),
-                    kmRecorridos != null ? kmRecorridos : null);
+                    kmRecorridos != null ? kmRecorridos : 0.0,
+                    minutosTotales           // ← AHORA LE MANDÁS LOS MINUTOS !!!
+            );
         }
 
-        // Enviar datos de facturación al MS de facturación
+        // --- ENVIAR DATOS A FACTURACIÓN ---
         DatosDeFacturacionDTO datos = new DatosDeFacturacionDTO(
                 v.getCuentaId(),
                 v.getId(),
                 (int) minutosTotales,
                 (int) minutosPausas,
-                minutosPausas > 15, // pausa extensa si supera 15 min
+                minutosPausas > 15,  // pausa extensa > 15 min
                 LocalDate.now()
         );
+
         facturaClientViajes.generarFactura(datos);
 
         return datos;
     }
+
 
 
     /**

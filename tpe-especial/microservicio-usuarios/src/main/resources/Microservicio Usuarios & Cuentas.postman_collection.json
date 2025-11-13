@@ -1,0 +1,452 @@
+{
+	"info": {
+		"_postman_id": "a26f8e46-e250-404b-9727-9f8724c95f09",
+		"name": "Microservicio Usuarios & Cuentas",
+		"description": "Colección completa para probar Usuarios y Cuentas",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "49156834",
+		"_collection_link": "https://lalegrezelione-1042574.postman.co/workspace/LAUTARO-ALEJO-ALEGRE-ZELIONE's-~d8dc0778-ec9d-4b95-813d-4a26ce6faa59/collection/49156834-a26f8e46-e250-404b-9727-9f8724c95f09?action=share&source=collection_link&creator=49156834"
+	},
+	"item": [
+		{
+			"name": "Usuarios",
+			"item": [
+				{
+					"name": "Crear Usuario (ADMIN)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nombre\": \"Juan\",\n  \"apellido\": \"Perez\",\n  \"email\": \"juan.admin@example.com\",\n  \"celular\": \"1123456789\",\n  \"rol\": \"ADMIN\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/usuarios/crear/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"usuarios",
+								"crear",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Crear Usuario (USER)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nombre\": \"Lucas\",\n  \"apellido\": \"Gomez\",\n  \"email\": \"lucas@example.com\",\n  \"celular\": \"1165432189\",\n  \"rol\": \"USER\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/usuarios/crear/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"usuarios",
+								"crear",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar Usuario",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nombre\": \"Lucas\",\n  \"apellido\": \"Gomez\",\n  \"email\": \"lucasg@example.com\",\n  \"celular\": \"1188887777\",\n  \"rol\": \"USER\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/usuarios/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"usuarios",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener Usuario",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/usuarios/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"usuarios",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Eliminar Usuario (ADMIN)",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/usuarios/borrar/2/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"usuarios",
+								"borrar",
+								"2",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Ver Uso del Usuario",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/usuarios/1/uso/1?desde=2025-01-01&hasta=2025-01-31&incluirRelacionados=false",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"usuarios",
+								"1",
+								"uso",
+								"1"
+							],
+							"query": [
+								{
+									"key": "desde",
+									"value": "2025-01-01"
+								},
+								{
+									"key": "hasta",
+									"value": "2025-01-31"
+								},
+								{
+									"key": "incluirRelacionados",
+									"value": "false"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Verificar si es Admin",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/usuarios/1/es-admin",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"usuarios",
+								"1",
+								"es-admin"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Usuarios por tipo de cuenta",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/usuarios/por-tipo-cuenta?tipoCuenta=PREMIUM",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"usuarios",
+								"por-tipo-cuenta"
+							],
+							"query": [
+								{
+									"key": "tipoCuenta",
+									"value": "PREMIUM"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Todos los usuarios",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/usuarios",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"usuarios"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Cuentas",
+			"item": [
+				{
+					"name": "Crear Cuenta",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"fechaAlta\": \"2025-01-10\",\n  \"saldo\": 1500.0,\n  \"activa\": true,\n  \"mercadoPagoId\": \"mp_789456\",\n  \"tipoCuenta\": \"PREMIUM\",\n  \"usuariosIds\": [1]\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/cuentas/crear/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"cuentas",
+								"crear",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar Cuenta",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"fechaAlta\": \"2025-01-10\",\n  \"saldo\": 2200.0,\n  \"activa\": true,\n  \"mercadoPagoId\": \"mp_123456\",\n  \"tipoCuenta\": \"PREMIUM\",\n  \"usuariosIds\": [1,3]\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/cuentas/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"cuentas",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener Cuenta",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/cuentas/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"cuentas",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Eliminar Cuenta",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/cuentas/borrar/1/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"cuentas",
+								"borrar",
+								"1",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Anular Cuenta",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/cuentas/1/anular/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"cuentas",
+								"1",
+								"anular",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Activar Cuenta",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/cuentas/1/activar/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"cuentas",
+								"1",
+								"activar",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Asociar Usuario a Cuenta",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/cuentas/1/asociar-usuario/2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"cuentas",
+								"1",
+								"asociar-usuario",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Debitar Saldo",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/cuentas/1/debitar/300",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"cuentas",
+								"1",
+								"debitar",
+								"300"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "New Request",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

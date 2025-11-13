@@ -26,9 +26,9 @@ public class MonopatinController {
         return service.buscarPorId(id);
     }
 
-    @PostMapping
-    public MonopatinDTO crear(@RequestBody MonopatinDTO dto) {
-        return service.crear(dto);
+    @PostMapping("/crear/{idAdmin}")
+    public MonopatinDTO crear(@RequestBody MonopatinDTO dto, @PathVariable Long idAdmin) {
+        return service.crear(dto, idAdmin);
     }
 
     @PutMapping("/{id}")
@@ -36,9 +36,9 @@ public class MonopatinController {
         return service.actualizar(id, dto);
     }
 
-    @DeleteMapping("/{id}")
-    public void eliminar(@PathVariable Long id) {
-        service.eliminar(id);
+    @DeleteMapping("/borrar/{id}/{idAdmin}")
+    public void eliminar(@PathVariable Long id, @PathVariable Long idAdmin) {
+        service.eliminar(id, idAdmin);
     }
 
     // --- Operaciones adicionales específicas del dominio ---
@@ -50,9 +50,12 @@ public class MonopatinController {
 
     @PutMapping("/{id}/finalizar")
     public MonopatinDTO finalizar(@PathVariable Long id,
-            @RequestParam("kmRecorridos") Double kmRecorridos) {
-        return service.finalizarViaje(id, kmRecorridos);
+                                  @RequestParam Double kmRecorridos,
+                                  @RequestParam Long minutosTotales) {
+        return service.finalizarViaje(id, kmRecorridos, minutosTotales);
     }
+
+
 
     @PutMapping("/{id}/ubicacion")
     public MonopatinDTO actualizarUbicacion(@PathVariable Long id,

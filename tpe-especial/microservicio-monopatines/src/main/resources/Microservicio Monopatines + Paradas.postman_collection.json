@@ -1,0 +1,427 @@
+{
+	"info": {
+		"_postman_id": "cb6c2063-80a7-45f7-ac10-71bc8f815ddd",
+		"name": "Microservicio Monopatines + Paradas",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "49156834",
+		"_collection_link": "https://lalegrezelione-1042574.postman.co/workspace/LAUTARO-ALEJO-ALEGRE-ZELIONE's-~d8dc0778-ec9d-4b95-813d-4a26ce6faa59/collection/49156834-cb6c2063-80a7-45f7-ac10-71bc8f815ddd?action=share&source=collection_link&creator=49156834"
+	},
+	"item": [
+		{
+			"name": "Monopatines",
+			"item": [
+				{
+					"name": "Listar monopatines",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8083/monopatines",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8083",
+							"path": [
+								"monopatines"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Buscar monopatin por ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8083/monopatines/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8083",
+							"path": [
+								"monopatines",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Crear monopatin (ADMIN)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"latitud\": -37.324,\n  \"longitud\": -59.135,\n  \"estado\": \"DISPONIBLE\",\n  \"totalKm\": 0,\n  \"totalTiempoUso\": 0,\n  \"paradaId\": null\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8083/monopatines/crear/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8083",
+							"path": [
+								"monopatines",
+								"crear",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar monopatin",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"latitud\": -37.33,\n  \"longitud\": -59.14,\n  \"estado\": \"DISPONIBLE\",\n  \"totalKm\": 10,\n  \"totalTiempoUso\": 30,\n  \"paradaId\": 2\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8083/monopatines/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8083",
+							"path": [
+								"monopatines",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Eliminar monopatin (ADMIN)",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8083/monopatines/borrar/1/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8083",
+							"path": [
+								"monopatines",
+								"borrar",
+								"1",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cambiar estado",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8083/monopatines/1/estado?estado=EN_MANTENIMIENTO",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8083",
+							"path": [
+								"monopatines",
+								"1",
+								"estado"
+							],
+							"query": [
+								{
+									"key": "estado",
+									"value": "EN_MANTENIMIENTO"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Finalizar uso del monopatin",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8083/monopatines/1/finalizar?kmRecorridos=2.5",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8083",
+							"path": [
+								"monopatines",
+								"1",
+								"finalizar"
+							],
+							"query": [
+								{
+									"key": "kmRecorridos",
+									"value": "2.5"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar ubicación",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8083/monopatines/1/ubicacion?latitud=-37.32&longitud=-59.12",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8083",
+							"path": [
+								"monopatines",
+								"1",
+								"ubicacion"
+							],
+							"query": [
+								{
+									"key": "latitud",
+									"value": "-37.32"
+								},
+								{
+									"key": "longitud",
+									"value": "-59.12"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Listar cercanos",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8083/monopatines/cercanos?lat=-37.32&lon=-59.12&radio=2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8083",
+							"path": [
+								"monopatines",
+								"cercanos"
+							],
+							"query": [
+								{
+									"key": "lat",
+									"value": "-37.32"
+								},
+								{
+									"key": "lon",
+									"value": "-59.12"
+								},
+								{
+									"key": "radio",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Disponibilidad",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8083/monopatines/disponibilidad",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8083",
+							"path": [
+								"monopatines",
+								"disponibilidad"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reporte por KM",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8083/monopatines/reporte/km?incluirPausas=false&usuarioId=1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8083",
+							"path": [
+								"monopatines",
+								"reporte",
+								"km"
+							],
+							"query": [
+								{
+									"key": "incluirPausas",
+									"value": "false"
+								},
+								{
+									"key": "usuarioId",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Paradas",
+			"item": [
+				{
+					"name": "Listar paradas",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8083/paradas",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8083",
+							"path": [
+								"paradas"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Buscar parada por ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8083/paradas/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8083",
+							"path": [
+								"paradas",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Crear parada",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nombre\": \"Parada Centro\",\n  \"latitud\": -37.324,\n  \"longitud\": -59.135\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8083/paradas",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8083",
+							"path": [
+								"paradas"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar parada",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nombre\": \"Parada Terminal\",\n  \"latitud\": -37.33,\n  \"longitud\": -59.14\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8083/paradas/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8083",
+							"path": [
+								"paradas",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Eliminar parada",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8083/paradas/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8083",
+							"path": [
+								"paradas",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

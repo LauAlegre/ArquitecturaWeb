@@ -1,6 +1,5 @@
 package com.monopatines.usuarios.service;
 
-
 import client.ViajesClient;
 import com.monopatines.usuarios.dto.UsoCuentaDTO;
 import com.monopatines.usuarios.dto.UsuarioDTO;
@@ -11,6 +10,7 @@ import com.monopatines.usuarios.model.TipoCuenta;
 import com.monopatines.usuarios.model.Usuario;
 import com.monopatines.usuarios.repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -18,6 +18,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional(readOnly = true) // 🔹 Por defecto, todos los métodos son de solo lectura
 public class UsuarioService {
 
     private final UsuarioRepository repo;
@@ -29,7 +30,6 @@ public class UsuarioService {
         this.mapper = mapper;
         this.viajesClient = new ViajesClient();
     }
-
 
     // ---------------------- CRUD ----------------------
 
@@ -46,12 +46,15 @@ public class UsuarioService {
         return mapper.toDTO(usuario);
     }
 
-    public UsuarioDTO crear(UsuarioDTO dto) {
+    @Transactional(readOnly = false) // 🔹 Escritura → inicia transacción real
+    public UsuarioDTO crear(UsuarioDTO dto, Long idAdmin) {
+        verificarPermisosAdmin(idAdmin);
         Usuario nuevo = mapper.toEntity(dto);
         Usuario guardado = repo.save(nuevo);
         return mapper.toDTO(guardado);
     }
 
+    @Transactional(readOnly = false)
     public UsuarioDTO actualizar(Long id, UsuarioDTO dto) {
         Usuario existente = repo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
@@ -62,21 +65,23 @@ public class UsuarioService {
         return mapper.toDTO(repo.save(existente));
     }
 
-    public void eliminar(Long id) {
+    @Transactional(readOnly = false)
+    public void eliminar(Long id, Long idAdmin) {
+        verificarPermisosAdmin(idAdmin);
+
         repo.deleteById(id);
     }
 
-    // ---------------------- NUEVO MÉTODO ----------------------
+    // ---------------------- CONSULTAS COMPLEJAS ----------------------
 
     /**
      * Obtiene el uso de monopatines por usuario.
      * Si incluirRelacionados = true, suma los viajes de todas las cuentas del usuario.
      * Si incluirRelacionados = false, solo los viajes del usuario específico.
      */
-    public UsoCuentaDTO obtenerUso(Long idUsuario, LocalDate desde, LocalDate hasta, boolean incluirRelacionados, Long idSolicitante) {
+    public UsoCuentaDTO obtenerUso(Long idUsuario, LocalDate desde, LocalDate hasta, boolean incluirRelacionados) {
 
-        // 1️⃣ Verificar permisos
-        verificarPermisosAdmin(idSolicitante);
+
 
         // 2️⃣ Buscar usuario objetivo
         Usuario usuario = repo.findById(idUsuario)
@@ -87,13 +92,11 @@ public class UsuarioService {
         int totalViajes = 0;
 
         if (incluirRelacionados) {
-            // 🔹 Buscar todas las cuentas del usuario
             List<Cuenta> cuentas = usuario.getCuentas();
             if (cuentas == null || cuentas.isEmpty()) {
                 throw new RuntimeException("El usuario no tiene cuentas asociadas");
             }
 
-            // 🔹 Sumar los usos de todas las cuentas
             List<UsoCuentaDTO> usos = cuentas.stream()
                     .map(c -> viajesClient.obtenerUsoPorCuenta(c.getId(), desde, hasta))
                     .filter(Objects::nonNull)
@@ -103,11 +106,9 @@ public class UsuarioService {
             totalMin = usos.stream().mapToDouble(UsoCuentaDTO::getTiempoTotal).sum();
             totalViajes = usos.stream().mapToInt(UsoCuentaDTO::getCantidadViajes).sum();
 
-            // Devuelve como agregado total
-            return new UsoCuentaDTO(null,"Agregado" ,totalKm, totalMin, totalViajes);
+            return new UsoCuentaDTO(null, "Agregado", totalKm, totalMin, totalViajes);
 
         } else {
-            // 🔹 Solo uso personal (por usuario)
             UsoCuentaDTO usoPersonal = viajesClient.obtenerUsoPorUsuario(usuario.getId(), desde, hasta);
 
             if (usoPersonal == null) {
@@ -124,9 +125,8 @@ public class UsuarioService {
         }
     }
 
-    /**
-     * Verifica que el solicitante tenga rol ADMIN.
-     */
+    // ---------------------- PERMISOS Y UTILITARIOS ----------------------
+
     private void verificarPermisosAdmin(Long idSolicitante) {
         Usuario solicitante = repo.findById(idSolicitante)
                 .orElseThrow(() -> new RuntimeException("Usuario solicitante no encontrado con id: " + idSolicitante));
@@ -139,9 +139,6 @@ public class UsuarioService {
     public boolean esAdmin(Long idUsuario) {
         Usuario usuario = repo.findById(idUsuario)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado con id: " + idUsuario));
-
-        // Supone que Usuario tiene un atributo 'rol' o 'tipoUsuario'
-        // Por ejemplo: "ADMIN" o "USER"
         return usuario.getRol() == Rol.ADMIN;
     }
 

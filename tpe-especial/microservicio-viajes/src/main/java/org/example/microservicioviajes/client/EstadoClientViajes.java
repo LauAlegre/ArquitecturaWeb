@@ -26,18 +26,17 @@ public class EstadoClientViajes {
     }
 
     // Finaliza el monopatín (lo deja DISPONIBLE y suma km)
-    public void finalizarMonopatin(Long monopatinId, Double kmRecorridos) {
-        if (monopatinId == null) {
-            throw new IllegalArgumentException("monopatinId es obligatorio");
-        }
+    public void finalizarMonopatin(Long monopatinId, Double kmRecorridos, Long minutos) {
         UriComponents builder = UriComponentsBuilder
                 .fromHttpUrl("http://localhost:8083/monopatines/{id}/finalizar")
                 .buildAndExpand(monopatinId);
-        String url = kmRecorridos == null
-                ? builder.toUriString()
-                : UriComponentsBuilder.fromUriString(builder.toUriString())
-                        .queryParam("kmRecorridos", kmRecorridos)
-                        .toUriString();
+
+        String url = UriComponentsBuilder.fromUriString(builder.toUriString())
+                .queryParam("kmRecorridos", kmRecorridos)
+                .queryParam("minutosTotales", minutos)
+                .toUriString();
+
         restTemplate.put(url, null);
     }
+
 }

@@ -1,5 +1,6 @@
 package example.org.microserviciofacturacion.service;
 
+import example.org.microserviciofacturacion.client.UsuarioClient;
 import example.org.microserviciofacturacion.dto.TarifaDto;
 import example.org.microserviciofacturacion.mapper.Tarifamapper;    // 👈
 import example.org.microserviciofacturacion.model.Tarifa;
@@ -15,12 +16,14 @@ import java.util.List;
 public class TarifaServiceImpl implements TarifaService {
 
     private final TarifaRepository tarifaRepository;
-    private final Tarifamapper tarifaMapper;                         // 👈
+    private final Tarifamapper tarifaMapper;
+    private final UsuarioClient usuarioClient ;
 
     public TarifaServiceImpl(TarifaRepository tarifaRepository,
                               Tarifamapper tarifamapper) {            // 👈
         this.tarifaRepository = tarifaRepository;
-        this.tarifaMapper = tarifamapper;                            // 👈
+        this.tarifaMapper = tarifamapper;
+        this.usuarioClient = new UsuarioClient();
     }
 
     @Override
@@ -32,7 +35,10 @@ public class TarifaServiceImpl implements TarifaService {
 
     @Transactional
     @Override
-    public Tarifa crearAjuste(TarifaDto dto) {
+    public Tarifa crearAjuste(TarifaDto dto, Long id_admin) {
+        if(!usuarioClient.esAdmin(id_admin)){
+            throw new IllegalArgumentException("El usuario no es administrador");
+        }
         if (dto.getFechaInicioVigencia() == null)
             throw new IllegalArgumentException("fechaInicioVigencia es obligatoria");
 
@@ -59,4 +65,15 @@ public class TarifaServiceImpl implements TarifaService {
                 .sorted(Comparator.comparing(Tarifa::getFechaInicioVigencia).reversed())
                 .toList();
     }
+    @Override
+    @Transactional(readOnly = false)
+    public void eliminarTarifa(Long id) {
+
+
+        Tarifa tarifa = tarifaRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("No existe la tarifa con id " + id));
+
+        tarifaRepository.delete(tarifa);
+    }
+
 }

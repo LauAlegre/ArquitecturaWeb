@@ -28,9 +28,9 @@ public class UsuarioController {
         return service.buscarPorId(id);
     }
 
-    @PostMapping
-    public UsuarioDTO crear(@RequestBody UsuarioDTO dto) {
-        return service.crear(dto);
+    @PostMapping("/crear/{idAdmin}")
+    public UsuarioDTO crear(@RequestBody UsuarioDTO dto, @PathVariable Long idAdmin) {
+        return service.crear(dto, idAdmin);
     }
 
     @PutMapping("/{id}")
@@ -38,17 +38,17 @@ public class UsuarioController {
         return service.actualizar(id, dto);
     }
 
-    @DeleteMapping("/{id}")
-    public void eliminar(@PathVariable Long id) {
-        service.eliminar(id);
+    @DeleteMapping("/borrar/{id}/{idAdmin}")
+    public void eliminar(@PathVariable Long id,Long idAdmin) {
+        service.eliminar(id, idAdmin);
     }
 
     @GetMapping("/{id}/uso/{idUsuario}")
-    public UsoCuentaDTO obtenerUso(@PathVariable Long idUsuario,@PathVariable Long id,
+    public UsoCuentaDTO obtenerUso(@PathVariable Long id,
                                    @RequestParam LocalDate desde,
                                    @RequestParam LocalDate hasta,
                                    @RequestParam(defaultValue = "false") boolean incluirRelacionados) {
-        return service.obtenerUso(id, desde, hasta, incluirRelacionados, idUsuario);
+        return service.obtenerUso(id, desde, hasta, incluirRelacionados);
     }
     // ✅ Nuevo endpoint: verificar si un usuario es admin
     @GetMapping("/{id}/es-admin")

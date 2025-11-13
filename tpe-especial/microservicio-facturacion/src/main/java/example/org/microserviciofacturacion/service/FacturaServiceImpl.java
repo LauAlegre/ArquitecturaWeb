@@ -33,6 +33,9 @@ public class FacturaServiceImpl implements FacturaService {
     @Transactional
     public Factura generarFactura(DatosDeFacturacionDto dto) {
 
+        // 🔹 DEBUG 1: Mostrar datos que llegan
+        System.out.println("📩 [FACTURACIÓN] Recibido DTO: " + dto);
+
         // 1️⃣ Validaciones básicas
         if (dto.getIdCuenta() == null || dto.getIdViaje() == null)
             throw new IllegalArgumentException("idCuenta e idViaje son obligatorios");
@@ -41,23 +44,29 @@ public class FacturaServiceImpl implements FacturaService {
 
         // 2️⃣ Fecha de emisión
         LocalDate fecha = (dto.getFechaEmision() == null) ? LocalDate.now() : dto.getFechaEmision();
+        System.out.println("📅 Fecha de emisión: " + fecha);
 
         // 3️⃣ Tarifa vigente según la fecha
         Tarifa tarifa = tarifaService.vigente(fecha);
+        System.out.println("💰 Tarifa vigente -> precioMinuto=" + tarifa.getPrecioMinuto()
+                + ", precioExtraPausa=" + tarifa.getPrecioExtraPausa());
 
         // 4️⃣ Cálculo del monto base
         double monto = dto.getMinutosViaje() * tarifa.getPrecioMinuto();
+        System.out.println("🧾 Minutos viaje: " + dto.getMinutosViaje() + " -> monto base: $" + monto);
 
         // 5️⃣ Evaluar pausas (cortas o extensas)
         if (dto.getMinutosPausa() > 0) {
             if (dto.getMinutosPausa() > 15) {
-                // 🕒 Pausa extensa → tarifa extra definida por admin
+                System.out.println("⏸ Pausa extensa (" + dto.getMinutosPausa() + " min) -> se suma tarifa extra");
                 monto += tarifa.getPrecioExtraPausa();
             } else {
-                // ⏸ Pausa corta → se cobra al precio normal
+                System.out.println("⏸ Pausa corta (" + dto.getMinutosPausa() + " min) -> se suma al precio normal");
                 monto += dto.getMinutosPausa() * tarifa.getPrecioMinuto();
             }
         }
+
+        System.out.println("💵 Monto final calculado: $" + monto);
 
         // 6️⃣ Crear la entidad Factura
         Factura factura = new Factura();
@@ -68,12 +77,17 @@ public class FacturaServiceImpl implements FacturaService {
 
         // 7️⃣ Guardar en BD
         Factura guardada = facturaRepository.save(factura);
+        System.out.println("✅ Factura guardada con ID: " + guardada.getIdFactura());
 
         // 8️⃣ Comunicar al microservicio Usuarios para debitar el saldo
         try {
+            System.out.println("🔁 Enviando solicitud a microservicio USUARIOS para debitar $" + monto
+                    + " de la cuenta ID " + dto.getIdCuenta());
             cuentaClient.debitarSaldo(dto.getIdCuenta(), monto);
+            System.out.println("✅ Débito realizado correctamente");
         } catch (Exception e) {
-            // Si falla el débito, revertimos la creación de la factura
+            System.err.println("🚨 ERROR al debitar saldo: " + e.getMessage());
+            e.printStackTrace();
             throw new RuntimeException("Error al debitar saldo en el microservicio de usuarios: " + e.getMessage());
         }
 

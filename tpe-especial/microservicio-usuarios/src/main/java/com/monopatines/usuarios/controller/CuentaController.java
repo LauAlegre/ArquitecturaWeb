@@ -25,9 +25,9 @@ public class CuentaController {
         return service.buscarPorId(id);
     }
 
-    @PostMapping
-    public CuentaDTO crear(@RequestBody CuentaDTO dto) {
-        return service.crear(dto);
+    @PostMapping("/crear/{idAdmin}")
+    public CuentaDTO crear(@RequestBody CuentaDTO dto, @PathVariable Long idAdmin) {
+        return service.crear(dto, idAdmin);
     }
 
     @PutMapping("/{id}")
@@ -35,9 +35,9 @@ public class CuentaController {
         return service.actualizar(id, dto);
     }
 
-    @DeleteMapping("/{id}")
-    public void eliminar(@PathVariable Long id) {
-        service.eliminar(id);
+    @DeleteMapping("/borrar/{id}/{idAdmin}")
+    public void eliminar(@PathVariable Long id, @PathVariable Long idAdmin) {
+        service.eliminar(id, idAdmin);
     }
 
     @PutMapping("/{id}/anular/{idAdmin}")
@@ -62,6 +62,7 @@ public class CuentaController {
         service.debitarSaldo(id, monto);
         return "Se debitó $" + monto + " de la cuenta " + id;
     }
+
 
 }
 

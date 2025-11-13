@@ -1,0 +1,476 @@
+{
+	"info": {
+		"_postman_id": "c1696071-753a-4637-9546-f61e1a02c8e4",
+		"name": "Microservicio Viajes & Pausas",
+		"description": "Colección completa para probar los endpoints de Viajes y Pausas.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "49156834",
+		"_collection_link": "https://lalegrezelione-1042574.postman.co/workspace/LAUTARO-ALEJO-ALEGRE-ZELIONE's-~d8dc0778-ec9d-4b95-813d-4a26ce6faa59/collection/49156834-c1696071-753a-4637-9546-f61e1a02c8e4?action=share&source=collection_link&creator=49156834"
+	},
+	"item": [
+		{
+			"name": "VIAJES",
+			"item": [
+				{
+					"name": "Listar viajes",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/viajes",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"viajes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Buscar viaje por ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/viajes/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"viajes",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Iniciar viaje",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"cuentaId\": 1,\n  \"monopatinId\": 5,\n  \"usuarioId\": 2\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/viajes/iniciar",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"viajes",
+								"iniciar"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar viaje",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"cuentaId\": 1,\n  \"monopatinId\": 5,\n  \"usuarioId\": 2,\n  \"fechaInicio\": \"2025-11-12T15:00:00\",\n  \"fechaFin\": \"2025-11-12T16:00:00\",\n  \"kmRecorridos\": 10.5\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/viajes/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"viajes",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Eliminar viaje",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/viajes/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"viajes",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cerrar viaje",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/viajes/1/cerrar?kmRecorridos=12.5",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"viajes",
+								"1",
+								"cerrar"
+							],
+							"query": [
+								{
+									"key": "kmRecorridos",
+									"value": "12.5"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Listar viajes por monopatin",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/viajes?monopatinId=5",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"viajes"
+							],
+							"query": [
+								{
+									"key": "monopatinId",
+									"value": "5"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reporte Monopatines + X Viajes",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/viajes/reporte/monopatines-mas-viajes?anio=2025&minViajes=20&usuarioAdminId=1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"viajes",
+								"reporte",
+								"monopatines-mas-viajes"
+							],
+							"query": [
+								{
+									"key": "anio",
+									"value": "2025"
+								},
+								{
+									"key": "minViajes",
+									"value": "20"
+								},
+								{
+									"key": "usuarioAdminId",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Uso por cuenta",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/viajes/uso-cuenta/1?desde=2025-01-01&hasta=2025-01-31",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"viajes",
+								"uso-cuenta",
+								"1"
+							],
+							"query": [
+								{
+									"key": "desde",
+									"value": "2025-01-01"
+								},
+								{
+									"key": "hasta",
+									"value": "2025-01-31"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Uso por usuario",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/viajes/uso-usuario/2?desde=2025-01-01&hasta=2025-01-31",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"viajes",
+								"uso-usuario",
+								"2"
+							],
+							"query": [
+								{
+									"key": "desde",
+									"value": "2025-01-01"
+								},
+								{
+									"key": "hasta",
+									"value": "2025-01-31"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Ranking usuarios por tipo",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/viajes/uso-usuarios-por-tipo?desde=2025-01-01&hasta=2025-01-31&tipoUsuario=PREMIUM&usuarioAdminId=1&limite=10",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"viajes",
+								"uso-usuarios-por-tipo"
+							],
+							"query": [
+								{
+									"key": "desde",
+									"value": "2025-01-01"
+								},
+								{
+									"key": "hasta",
+									"value": "2025-01-31"
+								},
+								{
+									"key": "tipoUsuario",
+									"value": "PREMIUM"
+								},
+								{
+									"key": "usuarioAdminId",
+									"value": "1"
+								},
+								{
+									"key": "limite",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "PAUSAS",
+			"item": [
+				{
+					"name": "Listar pausas del viaje",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/viajes/1/pausas",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"viajes",
+								"1",
+								"pausas"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Pausa abierta",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/viajes/1/pausas/abierta",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"viajes",
+								"1",
+								"pausas",
+								"abierta"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Iniciar pausa",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/viajes/1/pausas",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"viajes",
+								"1",
+								"pausas"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar pausa",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"fechaInicio\": \"2025-10-10T10:00:00\",\n  \"fechaFin\": \"2025-10-10T10:20:00\",\n  \"duracionMinutos\": 20,\n  \"viajeId\": 1\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/viajes/1/pausas/5",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"viajes",
+								"1",
+								"pausas",
+								"5"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cerrar pausa",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/viajes/1/pausas/5/cerrar",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"viajes",
+								"1",
+								"pausas",
+								"5",
+								"cerrar"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Eliminar pausa",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/viajes/1/pausas/5",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"viajes",
+								"1",
+								"pausas",
+								"5"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8082"
+		}
+	]
+}

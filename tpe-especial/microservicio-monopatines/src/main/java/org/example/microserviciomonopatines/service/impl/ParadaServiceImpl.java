@@ -1,24 +1,29 @@
 package org.example.microserviciomonopatines.service.impl;
 
+import org.example.microserviciomonopatines.client.UsuarioClientMonopatines;
 import org.example.microserviciomonopatines.dto.ParadaDTO;
 import org.example.microserviciomonopatines.model.Parada;
 import org.example.microserviciomonopatines.repository.ParadaRepository;
 import org.example.microserviciomonopatines.service.ParadaService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.example.microserviciomonopatines.mapper.ParadaMapper;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional(readOnly = true)
 public class ParadaServiceImpl implements ParadaService {
 
     private final ParadaRepository repository;
     private final ParadaMapper mapper;
+    private final UsuarioClientMonopatines usuarioClient;
 
     public ParadaServiceImpl(ParadaRepository repository, ParadaMapper mapper) {
         this.repository = repository;
         this.mapper = mapper;
+        this.usuarioClient = new UsuarioClientMonopatines();
     }
 
     @Override
@@ -37,13 +42,17 @@ public class ParadaServiceImpl implements ParadaService {
     }
 
     @Override
-    public ParadaDTO crear(ParadaDTO dto) {
+    @Transactional(readOnly = false)
+    public ParadaDTO crear(ParadaDTO dto,Long idAdmin) {
+        if (!usuarioClient.esAdmin(idAdmin)) {
+            throw new IllegalArgumentException("El usuario no es administrador");
+        }
         Parada parada = mapper.toEntity(dto);
-        Parada guardada = repository.save(parada);
-        return mapper.toDTO(guardada);
+        return mapper.toDTO(repository.save(parada));
     }
 
     @Override
+    @Transactional(readOnly = false)
     public ParadaDTO actualizar(Long id, ParadaDTO dto) {
         Parada existente = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Parada no encontrada con id " + id));
@@ -53,13 +62,15 @@ public class ParadaServiceImpl implements ParadaService {
         existente.setLongitud(dto.getLongitud());
         existente.setCapacidad(dto.getCapacidad());
 
-        Parada actualizada = repository.save(existente);
-        return mapper.toDTO(actualizada);
+        return mapper.toDTO(repository.save(existente));
     }
 
     @Override
-    public void eliminar(Long id) {
+    @Transactional(readOnly = false)
+    public void eliminar(Long id, Long idAdmin) {
+        if (!usuarioClient.esAdmin(idAdmin)) {
+            throw new IllegalArgumentException("El usuario no es administrador");
+        }
         repository.deleteById(id);
     }
-
 }

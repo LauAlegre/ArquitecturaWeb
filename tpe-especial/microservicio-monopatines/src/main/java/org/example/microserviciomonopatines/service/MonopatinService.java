@@ -12,11 +12,11 @@ public interface MonopatinService {
 
     MonopatinDTO buscarPorId(Long id);
 
-    MonopatinDTO crear(MonopatinDTO dto);
+    MonopatinDTO crear(MonopatinDTO dto, Long idAdmin);
 
     MonopatinDTO actualizar(Long id, MonopatinDTO dto);
 
-    void eliminar(Long id);
+    void eliminar(Long id, Long idAdmin);
 
     MonopatinDTO darDeBaja(Long id);
 
@@ -34,5 +34,6 @@ public interface MonopatinService {
 
     List<MonopatinReporteDTO> generarReporteKm(Boolean incluirPausas, Long usuarioId);
 
-    MonopatinDTO finalizarViaje(Long id, Double kmRecorridos);
+    MonopatinDTO finalizarViaje(Long id, Double kmRecorridos, Long minutosTotales);
 }
+

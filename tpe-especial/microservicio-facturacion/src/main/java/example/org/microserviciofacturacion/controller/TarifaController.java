@@ -15,6 +15,7 @@ public class TarifaController {
 
     private final TarifaService tarifaService;
 
+
     // Inyección del servicio de tarifas
     public TarifaController(TarifaService tarifaService) {
         this.tarifaService = tarifaService;
@@ -30,9 +31,9 @@ public class TarifaController {
 
     // POST /tarifas/ajuste
     // Crea una nueva tarifa con fecha de inicio de vigencia
-    @PostMapping("/ajuste")
-    public Tarifa crearAjuste(@RequestBody TarifaDto dto) {
-        return tarifaService.crearAjuste(dto);
+    @PostMapping("/ajuste/{id}")
+    public Tarifa crearAjuste(@RequestBody TarifaDto dto, @PathVariable Long id) {
+        return tarifaService.crearAjuste(dto, id);
     }
 
     // GET /tarifas/historial
@@ -40,5 +41,9 @@ public class TarifaController {
     @GetMapping("/historial")
     public List<Tarifa> historial() {
         return tarifaService.historial();
+    }
+    @DeleteMapping("/{id}")
+    public void eliminarTarifa(@PathVariable Long id) {
+        tarifaService.eliminarTarifa(id);
     }
 }
