@@ -38,31 +38,39 @@ public interface ViajeRepository extends MongoRepository<ViajeModel, String> {
     List<MonopatinViajesCountDTO> findMonopatinesConMasViajesMongo(int anio, long minViajes);
 
     @Aggregation(pipeline = {
-            // Filtrar por período (fechaInicio entre inicio y fin) y por lista de usuarios
             "{ $match: { " +
                     "  fechaInicio: { $gte: ?0, $lt: ?1 }, " +
                     "  usuarioId: { $in: ?2 } " +
                     "} }",
-            // Agrupamos por usuarioId
+
+            "{ $addFields: { " +
+                    "  minutosViaje: { " +
+                    "       $divide: [ { $subtract: ['$fechaFin', '$fechaInicio'] }, 60000 ] " +
+                    "  } " +
+                    "} }",
+
             "{ $group: { " +
                     "  _id: '$usuarioId', " +
                     "  cantidadViajes: { $sum: 1 }, " +
-                    "  kmTotales: { $sum: { $ifNull: ['$kmRecorridos', 0] } }" +
-                    // Si tenés un campo duracionMinutos, podés sumar así:
-                    // "  minutosTotales: { $sum: { $ifNull: ['$duracionMinutos', 0] } }" +
+                    "  kmTotales: { $sum: { $ifNull: ['$kmRecorridos', 0] } }, " +
+                    "  minutosTotales: { $sum: '$minutosViaje' } " +
                     "} }",
-            // Ordenamos por cantidad de viajes desc
+
             "{ $sort: { cantidadViajes: -1 } }",
-            // Proyectamos al DTO
+
             "{ $project: { " +
                     "  _id: 0, " +
                     "  usuarioId: '$_id', " +
                     "  cantidadViajes: 1, " +
-                    "  kmTotales: 1" +
-                    // Acordate de agregar minutosTotales si lo calculaste en el $group
+                    "  totalKm: '$kmTotales', " +
+                    "  totalMinutos: '$minutosTotales' " +
                     "} }"
     })
-    List<UsoUsuarioDTO> findUsoUsuariosPeriodoPorIds(LocalDateTime inicio,
-                                                     LocalDateTime fin,
-                                                     List<Long> usuarioIds);
+    List<UsoUsuarioDTO> findUsoUsuariosPeriodoPorIds(
+            LocalDateTime inicio,
+            LocalDateTime fin,
+            List<Long> usuarioIds);
+
+
+
 }

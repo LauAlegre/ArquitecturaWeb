@@ -46,6 +46,8 @@ public interface MonopatinRepository extends JpaRepository<Monopatin, Long> {
             ") FROM Monopatin m")
     List<MonopatinReporteDTO> generarReporteKm(@Param("incluirPausas") boolean incluirPausas);
 
+
+
     @Modifying
     @Transactional
     @Query("UPDATE Monopatin m SET m.latitud = :lat, m.longitud = :lon WHERE m.id = :id")
