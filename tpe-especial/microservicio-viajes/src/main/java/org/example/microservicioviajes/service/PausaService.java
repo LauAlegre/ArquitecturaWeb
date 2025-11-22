@@ -4,137 +4,93 @@ import org.example.microservicioviajes.dto.PausaDTO;
 import org.example.microservicioviajes.mapper.PausaMapper;
 import org.example.microservicioviajes.model.PausaModel;
 import org.example.microservicioviajes.model.ViajeModel;
-import org.example.microservicioviajes.repository.PausaRepository;
 import org.example.microservicioviajes.repository.ViajeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class PausaService {
 
-    private final PausaRepository pausaRepository;
     private final ViajeRepository viajeRepository;
     private final PausaMapper pausaMapper;
 
-    // -------------------------------
-    // 🔹 Crear pausa
-    // -------------------------------
-    public PausaDTO crear(Long viajeId) {
+    // ------------------------------------
+    // 🔹 Crear pausa (embebida en viaje)
+    // ------------------------------------
+    public PausaDTO crear(String viajeId) {
+
         ViajeModel viaje = viajeRepository.findById(viajeId)
                 .orElseThrow(() -> new NoSuchElementException("Viaje no encontrado id=" + viajeId));
 
-        if (pausaRepository.existsByViajeIdAndFechaFinIsNull(viajeId)) {
+        // verificar pausa abierta
+        boolean existeAbierta = viaje.getPausas().stream()
+                .anyMatch(p -> p.getFechaFin() == null);
+
+        if (existeAbierta) {
             throw new IllegalStateException("Ya existe una pausa abierta para el viaje " + viajeId);
         }
 
-        PausaModel p = new PausaModel();
-        p.setFechaInicio(LocalDateTime.now());
-        p.setViaje(viaje);
+        PausaModel pausa = new PausaModel();
+        pausa.setFechaInicio(LocalDateTime.now());
 
-        PausaModel saved = pausaRepository.save(p);
-        return pausaMapper.toDTO(saved);
+        viaje.getPausas().add(pausa);
+        viajeRepository.save(viaje);
+
+        return pausaMapper.toDTO(pausa);
     }
 
-    // -------------------------------
-    // 🔹 Obtener pausa por ID
-    // -------------------------------
-    @Transactional(readOnly = true)
-    public PausaDTO obtenerPorId(Long pausaId) {
-        return pausaRepository.findById(pausaId)
-                .map(pausaMapper::toDTO)
-                .orElseThrow(() -> new NoSuchElementException("Pausa no encontrada id=" + pausaId));
-    }
 
-    // -------------------------------
-    // 🔹 Listar pausas de un viaje
-    // -------------------------------
-    @Transactional(readOnly = true)
-    public List<PausaDTO> listarPorViaje(Long viajeId) {
-        return pausaRepository.findByViajeId(viajeId)
-                .stream()
-                .map(pausaMapper::toDTO)
-                .collect(Collectors.toList());
-    }
+    // ------------------------------------
+    // 🔹 Obtener pausa abierta
+    // ------------------------------------
+    public PausaDTO pausaAbierta(String viajeId) {
+        ViajeModel viaje = viajeRepository.findById(viajeId)
+                .orElseThrow(() -> new NoSuchElementException("Viaje no encontrado id=" + viajeId));
 
-    // -------------------------------
-    // 🔹 Obtener la pausa abierta
-    // -------------------------------
-    @Transactional(readOnly = true)
-    public PausaDTO pausaAbierta(Long viajeId) {
-        return pausaRepository
-                .findFirstByViajeIdAndFechaFinIsNullOrderByFechaInicioDesc(viajeId)
+        return viaje.getPausas().stream()
+                .filter(p -> p.getFechaFin() == null)
+                .findFirst()
                 .map(pausaMapper::toDTO)
                 .orElse(null);
     }
 
-    // -------------------------------
+    // ------------------------------------
     // 🔹 Cerrar pausa
-    // -------------------------------
-    public PausaDTO cerrar(Long pausaId) {
-        PausaModel pausa = pausaRepository.findById(pausaId)
-                .orElseThrow(() -> new NoSuchElementException("Pausa no encontrada id=" + pausaId));
+    // ------------------------------------
+    public PausaDTO cerrar(String viajeId) {
 
-        if (pausa.getFechaFin() != null)
-            throw new IllegalStateException("La pausa ya está cerrada");
+        ViajeModel viaje = viajeRepository.findById(viajeId)
+                .orElseThrow(() -> new NoSuchElementException("Viaje no encontrado id=" + viajeId));
+
+        PausaModel pausa = viaje.getPausas().stream()
+                .filter(p -> p.getFechaFin() == null)
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("No hay pausa abierta para este viaje"));
 
         pausa.setFechaFin(LocalDateTime.now());
 
-        long minutos = Duration.between(pausa.getFechaInicio(), pausa.getFechaFin()).toMinutes();
-        pausa.setDuracionMinutos((int) Math.max(0, minutos));
+        long min = Duration.between(pausa.getFechaInicio(), pausa.getFechaFin()).toMinutes();
+        pausa.setDuracionMinutos((int) Math.max(0, min));
 
-        PausaModel saved = pausaRepository.save(pausa);
-        return pausaMapper.toDTO(saved);
+        viajeRepository.save(viaje);
+
+        return pausaMapper.toDTO(pausa);
     }
 
-    // -------------------------------
-    // 🔹 Actualizar pausa
-    // -------------------------------
-    public PausaDTO actualizar(Long pausaId, PausaDTO dto) {
-        PausaModel pausa = pausaRepository.findById(pausaId)
-                .orElseThrow(() -> new NoSuchElementException("Pausa no encontrada id=" + pausaId));
+    // ------------------------------------
+    // 🔹 Listar pausas
+    // ------------------------------------
+    public java.util.List<PausaDTO> listarPorViaje(String viajeId) {
+        ViajeModel viaje = viajeRepository.findById(viajeId)
+                .orElseThrow(() -> new NoSuchElementException("Viaje no encontrado id=" + viajeId));
 
-        // Reasociar viaje
-        if (dto.getViajeId() != null &&
-                (pausa.getViaje() == null ||
-                        !dto.getViajeId().equals(pausa.getViaje().getId()))) {
-
-            ViajeModel viaje = viajeRepository.findById(dto.getViajeId())
-                    .orElseThrow(() -> new NoSuchElementException("Viaje no encontrado id=" + dto.getViajeId()));
-            pausa.setViaje(viaje);
-        }
-
-        // Actualizar fechas
-        if (dto.getFechaInicio() != null) pausa.setFechaInicio(dto.getFechaInicio());
-        if (dto.getFechaFin() != null) pausa.setFechaFin(dto.getFechaFin());
-
-        // Actualizar duración
-        if (pausa.getFechaInicio() != null && pausa.getFechaFin() != null) {
-            long mins = Duration.between(pausa.getFechaInicio(), pausa.getFechaFin()).toMinutes();
-            pausa.setDuracionMinutos((int) Math.max(0, mins));
-        } else if (dto.getDuracionMinutos() != null) {
-            pausa.setDuracionMinutos(dto.getDuracionMinutos());
-        }
-
-        PausaModel saved = pausaRepository.save(pausa);
-        return pausaMapper.toDTO(saved);
-    }
-
-    // -------------------------------
-    // 🔹 Eliminar pausa  (FALTABA)
-    // -------------------------------
-    public void eliminar(Long pausaId) {
-        if (!pausaRepository.existsById(pausaId)) {
-            throw new NoSuchElementException("Pausa no encontrada id=" + pausaId);
-        }
-        pausaRepository.deleteById(pausaId);
+        return viaje.getPausas().stream()
+                .map(pausaMapper::toDTO)
+                .toList();
     }
 }

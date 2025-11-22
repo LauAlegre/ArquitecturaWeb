@@ -2,8 +2,6 @@ package example.org.microserviciofacturacion.service;
 
 import example.org.microserviciofacturacion.client.CuentaClient;
 import example.org.microserviciofacturacion.dto.DatosDeFacturacionDto;
-import example.org.microserviciofacturacion.dto.FacturaDto;
-import example.org.microserviciofacturacion.mapper.Facturamapper;
 import example.org.microserviciofacturacion.mapper.Facturamapper;
 import example.org.microserviciofacturacion.model.Factura;
 import example.org.microserviciofacturacion.model.Tarifa;
@@ -19,77 +17,60 @@ public class FacturaServiceImpl implements FacturaService {
     private final FacturaRepository facturaRepository;
     private final TarifaService tarifaService;
     private final Facturamapper facturaMapper;
-    private final CuentaClient cuentaClient = new CuentaClient();
+    private final CuentaClient cuentaClient; // ✔ ahora se inyecta
 
     public FacturaServiceImpl(FacturaRepository facturaRepository,
                               TarifaService tarifaService,
-                              Facturamapper facturaMapper) {
+                              Facturamapper facturaMapper,
+                              CuentaClient cuentaClient) {  // ✔ inyectado por constructor
         this.facturaRepository = facturaRepository;
         this.tarifaService = tarifaService;
         this.facturaMapper = facturaMapper;
+        this.cuentaClient = cuentaClient;
     }
+
 
     @Override
     @Transactional
     public Factura generarFactura(DatosDeFacturacionDto dto) {
 
-        // 🔹 DEBUG 1: Mostrar datos que llegan
-        System.out.println("📩 [FACTURACIÓN] Recibido DTO: " + dto);
-
-        // 1️⃣ Validaciones básicas
+        // 🔹 Validaciones
         if (dto.getIdCuenta() == null || dto.getIdViaje() == null)
             throw new IllegalArgumentException("idCuenta e idViaje son obligatorios");
         if (dto.getMinutosViaje() <= 0)
             throw new IllegalArgumentException("Los minutos de viaje deben ser mayores a 0");
 
-        // 2️⃣ Fecha de emisión
-        LocalDate fecha = (dto.getFechaEmision() == null) ? LocalDate.now() : dto.getFechaEmision();
-        System.out.println("📅 Fecha de emisión: " + fecha);
+        // Fecha
+        LocalDate fecha = (dto.getFechaEmision() == null)
+                ? LocalDate.now()
+                : dto.getFechaEmision();
 
-        // 3️⃣ Tarifa vigente según la fecha
+        // Tarifa vigente
         Tarifa tarifa = tarifaService.vigente(fecha);
-        System.out.println("💰 Tarifa vigente -> precioMinuto=" + tarifa.getPrecioMinuto()
-                + ", precioExtraPausa=" + tarifa.getPrecioExtraPausa());
 
-        // 4️⃣ Cálculo del monto base
+        // Calcular monto
         double monto = dto.getMinutosViaje() * tarifa.getPrecioMinuto();
-        System.out.println("🧾 Minutos viaje: " + dto.getMinutosViaje() + " -> monto base: $" + monto);
 
-        // 5️⃣ Evaluar pausas (cortas o extensas)
         if (dto.getMinutosPausa() > 0) {
             if (dto.getMinutosPausa() > 15) {
-                System.out.println("⏸ Pausa extensa (" + dto.getMinutosPausa() + " min) -> se suma tarifa extra");
                 monto += tarifa.getPrecioExtraPausa();
             } else {
-                System.out.println("⏸ Pausa corta (" + dto.getMinutosPausa() + " min) -> se suma al precio normal");
                 monto += dto.getMinutosPausa() * tarifa.getPrecioMinuto();
             }
         }
 
-        System.out.println("💵 Monto final calculado: $" + monto);
-
-        // 6️⃣ Crear la entidad Factura
+        // Crear factura
         Factura factura = new Factura();
         factura.setIdCuenta(dto.getIdCuenta());
-        factura.setIdViaje(dto.getIdViaje());
+        factura.setIdViaje(dto.getIdViaje());   // ← ahora es STRING
         factura.setFechaEmision(fecha);
         factura.setMontoTotal(monto);
 
-        // 7️⃣ Guardar en BD
+        // Guardar
         Factura guardada = facturaRepository.save(factura);
-        System.out.println("✅ Factura guardada con ID: " + guardada.getIdFactura());
 
-        // 8️⃣ Comunicar al microservicio Usuarios para debitar el saldo
-        try {
-            System.out.println("🔁 Enviando solicitud a microservicio USUARIOS para debitar $" + monto
-                    + " de la cuenta ID " + dto.getIdCuenta());
-            cuentaClient.debitarSaldo(dto.getIdCuenta(), monto);
-            System.out.println("✅ Débito realizado correctamente");
-        } catch (Exception e) {
-            System.err.println("🚨 ERROR al debitar saldo: " + e.getMessage());
-            e.printStackTrace();
-            throw new RuntimeException("Error al debitar saldo en el microservicio de usuarios: " + e.getMessage());
-        }
+        // Llamar a microservicio usuarios para debitar
+        cuentaClient.debitarSaldo(dto.getIdCuenta(), monto);
 
         return guardada;
     }
@@ -111,4 +92,5 @@ public class FacturaServiceImpl implements FacturaService {
     public Iterable<Factura> obtenerTodas() {
         return facturaRepository.findAll();
     }
+
 }

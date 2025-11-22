@@ -1,45 +1,46 @@
 package org.example.microservicioviajes.model;
 
-import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity
-@Table(name = "viaje")
+@Document(collection = "viajes")
 @Getter
 @Setter
 @NoArgsConstructor
-@ToString(exclude = "pausas") // evita recursión con PausaModel
+@ToString
 public class ViajeModel {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id; // Mongo usa String u ObjectId
 
-    @Column(name = "fecha_inicio")
+    @Field("fecha_inicio")
     private LocalDateTime fechaInicio;
 
-    @Column(name = "fecha_fin")
+    @Field("fecha_fin")
     private LocalDateTime fechaFin;
 
-    @Column(name = "km_recorridos")
+    @Field("km_recorridos")
     private Double kmRecorridos;
 
-    @Column(name = "id_cuenta")
+    @Field("id_cuenta")
     private Long cuentaId;
 
-    @Column(name = "id_monopatin")
+    @Field("id_monopatin")
     private Long monopatinId;
 
-    @Column(name = "id_usuario")
+    @Field("id_usuario")
     private Long usuarioId;
 
-    @OneToMany(mappedBy = "viaje")
+    // 🔥 PAUSAS EMBEBIDAS
+    @Field("pausas")
     private List<PausaModel> pausas = new ArrayList<>();
 }

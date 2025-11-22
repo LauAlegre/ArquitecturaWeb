@@ -8,7 +8,10 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Component
 public class FacturaClientViajes {
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate ;
+    public FacturaClientViajes(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
 
     public void generarFactura(DatosDeFacturacionDTO dto) {
         try {

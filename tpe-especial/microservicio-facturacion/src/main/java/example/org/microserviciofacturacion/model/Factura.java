@@ -1,38 +1,30 @@
-// example.org.microserviciofacturacion.model.Factura
 package example.org.microserviciofacturacion.model;
 
 import jakarta.persistence.*;
+import lombok.*;
+
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "factura")
+@Table(name = "facturas")
+@Getter @Setter
+@NoArgsConstructor @AllArgsConstructor
 public class Factura {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idFactura;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
+    @Column(name = "id_cuenta", nullable = false)
     private Long idCuenta;
-    private Long idViaje;
 
-    @Column(name = "fecha_emision")   // columna en la BD
-    private LocalDate fechaEmision;   // nombre Java camelCase
+    // 🔥 AHORA STRING PARA ACEPTAR ObjectId DE MONGO
+    @Column(name = "id_viaje", nullable = false, length = 40)
+    private String idViaje;
+
+    @Column(name = "fecha_emision", nullable = false)
+    private LocalDate fechaEmision;
 
     @Column(name = "monto_total", nullable = false)
-    private double montoTotal;
-
-    // === getters & setters ===
-    public Long getIdFactura() { return idFactura; }
-    public void setIdFactura(Long idFactura) { this.idFactura = idFactura; }
-
-    public Long getIdCuenta() { return idCuenta; }
-    public void setIdCuenta(Long idCuenta) { this.idCuenta = idCuenta; }
-
-    public Long getIdViaje() { return idViaje; }
-    public void setIdViaje(Long idViaje) { this.idViaje = idViaje; }
-
-    public LocalDate getFechaEmision() { return fechaEmision; }
-    public void setFechaEmision(LocalDate fechaEmision) { this.fechaEmision = fechaEmision; }
-
-    public double getMontoTotal() { return montoTotal; }
-    public void setMontoTotal(double montoTotal) { this.montoTotal = montoTotal; }
+    private Double montoTotal;
 }

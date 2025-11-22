@@ -4,7 +4,7 @@ import java.time.LocalDate;
 
 public class FacturaDto {
     private Long idCuenta;
-    private Long idViaje;
+    private String idViaje;
     private LocalDate fechaEmision;  // opcional; si es null se usa hoy
     private int minutos;             // minutos del viaje
     private boolean pausaExtensa;    // > 15 min
@@ -13,8 +13,8 @@ public class FacturaDto {
     public Long getIdCuenta() { return idCuenta; }
     public void setIdCuenta(Long idCuenta) { this.idCuenta = idCuenta; }
 
-    public Long getIdViaje() { return idViaje; }
-    public void setIdViaje(Long idViaje) { this.idViaje = idViaje; }
+    public String getIdViaje() { return idViaje; }
+    public void setIdViaje(String idViaje) { this.idViaje = idViaje; }
 
     public LocalDate getFechaEmision() { return fechaEmision; }
     public void setFechaEmision(LocalDate fechaEmision) { this.fechaEmision = fechaEmision; }

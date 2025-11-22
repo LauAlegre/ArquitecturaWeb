@@ -20,10 +20,10 @@ public class TarifaServiceImpl implements TarifaService {
     private final UsuarioClient usuarioClient ;
 
     public TarifaServiceImpl(TarifaRepository tarifaRepository,
-                              Tarifamapper tarifamapper) {            // 👈
+                              Tarifamapper tarifamapper,UsuarioClient cliente) {            // 👈
         this.tarifaRepository = tarifaRepository;
         this.tarifaMapper = tarifamapper;
-        this.usuarioClient = new UsuarioClient();
+        this.usuarioClient = cliente;
     }
 
     @Override

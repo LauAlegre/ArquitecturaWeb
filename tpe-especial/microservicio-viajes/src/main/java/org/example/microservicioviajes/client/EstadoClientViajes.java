@@ -8,7 +8,10 @@ import org.springframework.web.client.RestTemplate;
 @Component
 public class EstadoClientViajes {
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate ;
+    public EstadoClientViajes(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
 
     // Cambia el estado del monopatín (p.ej., EN_USO, DISPONIBLE, EN_MANTENIMIENTO)
     public void cambiarEstado(Long monopatinId, String estado) {

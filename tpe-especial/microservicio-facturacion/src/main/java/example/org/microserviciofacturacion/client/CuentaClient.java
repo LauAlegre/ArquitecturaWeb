@@ -7,14 +7,12 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Component
 public class CuentaClient {
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate;
 
-    // 👈 correcto, porque el microservicio de usuarios corre en el puerto 8080
+    public CuentaClient(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
 
-    /**
-     * 🔹 Realiza el débito de saldo en una cuenta.
-     * Llama al endpoint PUT /cuentas/{id}/debitar/{monto}
-     */
     public void debitarSaldo(Long idCuenta, double monto) {
         String url = UriComponentsBuilder
                 .fromHttpUrl("http://localhost:8080/cuentas/{id}/debitar/{monto}")
@@ -24,3 +22,4 @@ public class CuentaClient {
         restTemplate.put(url, null);
     }
 }
+

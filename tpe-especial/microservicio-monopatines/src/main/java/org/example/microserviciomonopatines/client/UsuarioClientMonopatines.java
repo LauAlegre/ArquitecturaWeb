@@ -7,7 +7,12 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Component
 public class UsuarioClientMonopatines {
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate ;
+
+    public UsuarioClientMonopatines(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
+
 
     // Consulta si un usuario es admin en el microservicio de usuarios.
     public Boolean esAdmin(Long idUsuario) {

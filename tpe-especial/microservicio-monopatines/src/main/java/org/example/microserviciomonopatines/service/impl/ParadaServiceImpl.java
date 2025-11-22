@@ -20,10 +20,10 @@ public class ParadaServiceImpl implements ParadaService {
     private final ParadaMapper mapper;
     private final UsuarioClientMonopatines usuarioClient;
 
-    public ParadaServiceImpl(ParadaRepository repository, ParadaMapper mapper) {
+    public ParadaServiceImpl(ParadaRepository repository, ParadaMapper mapper, UsuarioClientMonopatines usuarioClient) {
         this.repository = repository;
         this.mapper = mapper;
-        this.usuarioClient = new UsuarioClientMonopatines();
+        this.usuarioClient = usuarioClient;
     }
 
     @Override

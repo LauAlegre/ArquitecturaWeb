@@ -12,7 +12,7 @@
     </parent>
 
     <groupId>org.example</groupId>
-    <artifactId>integrador-final</artifactId>
+    <artifactId>microservicio-facturacion</artifactId>
     <version>1.0.0</version>
     <name>Integrador Final</name>
     <description>Microservicio de Facturación y Tarifas</description>

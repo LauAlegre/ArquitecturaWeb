@@ -10,7 +10,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class DatosDeFacturacionDto {
     private Long idCuenta;
-    private Long idViaje;
+    private String idViaje;
     private int minutosViaje;
     private int minutosPausa;
     private boolean pausaExtensa;  // opcional, según tu lógica

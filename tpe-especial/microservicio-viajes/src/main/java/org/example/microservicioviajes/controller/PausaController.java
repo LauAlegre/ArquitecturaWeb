@@ -16,46 +16,27 @@ public class PausaController {
         this.service = service;
     }
 
-    // 🔹 Listar todas las pausas de un viaje
+    // LISTAR todas las pausas embebidas
     @GetMapping
-    public List<PausaDTO> listar(@PathVariable Long viajeId) {
+    public List<PausaDTO> listar(@PathVariable String viajeId) {
         return service.listarPorViaje(viajeId);
     }
 
-    // 🔹 Obtener una pausa por ID
-    @GetMapping("/{pausaId}")
-    public PausaDTO obtener(@PathVariable Long pausaId) {
-        return service.obtenerPorId(pausaId);
-    }
-
-    // 🔹 Ver pausa abierta del viaje (si existe)
+    // VER pausa abierta
     @GetMapping("/abierta")
-    public PausaDTO abierta(@PathVariable Long viajeId) {
+    public PausaDTO abierta(@PathVariable String viajeId) {
         return service.pausaAbierta(viajeId);
     }
 
-    // 🔹 Iniciar pausa
+    // CREAR una pausa (iniciar)
     @PostMapping
-    public PausaDTO iniciar(@PathVariable Long viajeId) {
+    public PausaDTO iniciar(@PathVariable String viajeId) {
         return service.crear(viajeId);
     }
 
-    // 🔹 Actualizar pausa
-    @PutMapping("/{pausaId}")
-    public PausaDTO actualizar(@PathVariable("pausaId") Long pausaId,
-                               @RequestBody PausaDTO dto) {
-        return service.actualizar(pausaId, dto);
-    }
-
-    // 🔹 Cerrar / frenar pausa (endpoint que faltaba)
-    @PutMapping("/{pausaId}/cerrar")
-    public PausaDTO cerrar(@PathVariable Long pausaId) {
-        return service.cerrar(pausaId);
-    }
-
-    // 🔹 Eliminar pausa
-    @DeleteMapping("/{pausaId}")
-    public void eliminar(@PathVariable Long pausaId) {
-        service.eliminar(pausaId);
+    // CERRAR la pausa abierta
+    @PutMapping("/cerrar")
+    public PausaDTO cerrar(@PathVariable String viajeId) {
+        return service.cerrar(viajeId);
     }
 }

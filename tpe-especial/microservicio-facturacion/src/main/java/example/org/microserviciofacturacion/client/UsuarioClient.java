@@ -1,10 +1,15 @@
 package example.org.microserviciofacturacion.client;
 
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-
+@Component
 public class UsuarioClient {
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate ;
+
+    public UsuarioClient(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
 
     // Consulta si un usuario es admin en el microservicio de usuarios.
     public Boolean esAdmin(Long idUsuario) {

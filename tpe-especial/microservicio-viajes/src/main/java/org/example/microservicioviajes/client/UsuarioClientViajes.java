@@ -10,7 +10,10 @@ import java.util.List;
 @Component
 public class UsuarioClientViajes {
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate ;
+    public UsuarioClientViajes(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
 
     // Consulta si un usuario es admin en el microservicio de usuarios.
     public Boolean esAdmin(Long idUsuario) {

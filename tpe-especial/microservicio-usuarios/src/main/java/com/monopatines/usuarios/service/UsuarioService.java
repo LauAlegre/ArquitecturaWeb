@@ -1,6 +1,6 @@
 package com.monopatines.usuarios.service;
 
-import client.ViajesClient;
+import com.monopatines.usuarios.client.ViajesClient;
 import com.monopatines.usuarios.dto.UsoCuentaDTO;
 import com.monopatines.usuarios.dto.UsuarioDTO;
 import com.monopatines.usuarios.mapper.UsuarioMapper;
@@ -25,10 +25,10 @@ public class UsuarioService {
     private final UsuarioMapper mapper;
     private final ViajesClient viajesClient;
 
-    public UsuarioService(UsuarioRepository repo, UsuarioMapper mapper) {
+    public UsuarioService(UsuarioRepository repo, UsuarioMapper mapper, ViajesClient viajesClient) {
         this.repo = repo;
         this.mapper = mapper;
-        this.viajesClient = new ViajesClient();
+        this.viajesClient =viajesClient;
     }
 
     // ---------------------- CRUD ----------------------

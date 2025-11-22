@@ -1,4 +1,4 @@
-package client;
+package com.monopatines.usuarios.client;
 
 import com.monopatines.usuarios.dto.UsoCuentaDTO;
 import org.springframework.stereotype.Component;
@@ -10,7 +10,10 @@ import java.time.LocalDate;
 @Component
 public class ViajesClient {
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate ;
+    public ViajesClient(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
 
     // 🔹 Trae los viajes por usuario (usa path variable)
     public UsoCuentaDTO obtenerUsoPorUsuario(Long idUsuario, LocalDate desde, LocalDate hasta) {
