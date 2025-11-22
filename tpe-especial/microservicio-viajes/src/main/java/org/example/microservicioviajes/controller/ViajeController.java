@@ -3,6 +3,8 @@ package org.example.microservicioviajes.controller;
 import org.example.microservicioviajes.dto.DatosDeFacturacionDTO;
 import org.example.microservicioviajes.dto.UsoDTO;
 import org.example.microservicioviajes.dto.ViajeDTO;
+import org.example.microservicioviajes.dto.MonopatinViajesCountDTO;
+import org.example.microservicioviajes.dto.UsoUsuarioDTO;
 import org.example.microservicioviajes.service.ViajeService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -75,5 +77,24 @@ public class ViajeController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta) {
 
         return service.usoPorUsuario(idUsuario, desde, hasta);
+    }
+
+    @GetMapping("/reporte/monopatines-mas-viajes")
+    public List<MonopatinViajesCountDTO> monopatinesMasViajes(@RequestParam int anio,
+                                                              @RequestParam long minViajes,
+                                                              @RequestParam Long usuarioAdminId) {
+
+        return service.monopatinesConMasDeXViajes(anio, minViajes, usuarioAdminId);
+    }
+
+    @GetMapping("/uso-usuarios-por-tipo")
+    public List<UsoUsuarioDTO> rankingUsuariosPorTipo(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta,
+            @RequestParam String tipoUsuario,
+            @RequestParam Long usuarioAdminId,
+            @RequestParam(defaultValue = "0") int limite) {
+
+        return service.usuariosMasActivosPorTipo(desde, hasta, tipoUsuario, usuarioAdminId, limite);
     }
 }
