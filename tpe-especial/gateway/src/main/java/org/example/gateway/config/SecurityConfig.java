@@ -8,7 +8,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -36,13 +35,59 @@ public class SecurityConfig {
 
         http.authorizeHttpRequests(auth -> auth
 
-                // Public
+                // ====================
+                //     PUBLIC ROUTES
+                // ====================
                 .requestMatchers("/auth/**").permitAll()
 
-                // Solo ADMIN puede ver todas las facturas
-                .requestMatchers(HttpMethod.GET, "/facturas/todas").hasAuthority("ADMIN")
+                // ====================
+                //     ADMIN ONLY
+                // ====================
 
-                // El resto requiere autenticación
+                // a - Reporte KM con o sin pausas // acomodar endpoint
+                .requestMatchers(HttpMethod.GET,
+                        "/monopatines/reporte/km").hasAuthority("ADMIN")
+
+                // b - Anular cuentas
+                .requestMatchers(HttpMethod.PUT,
+                        "/cuentas/*/anular").hasAuthority("ADMIN")
+
+                // c - Monopatines más viajes acomodar endpoint
+                .requestMatchers(HttpMethod.GET,
+                        "/api/v1/viajes/reporte/monopatines-mas-viajes")
+                .hasAuthority("ADMIN")
+
+                // d - Total facturado
+                .requestMatchers(HttpMethod.GET,
+                        "/facturas/total").hasAuthority("ADMIN")
+
+                // e - Ranking usuarios por tipo acomodar endpoint
+                .requestMatchers(HttpMethod.GET,
+                        "/api/v1/viajes/uso-usuarios-por-tipo").hasAuthority("ADMIN")
+
+                // f - Crear ajuste tarifa
+                .requestMatchers(HttpMethod.POST,
+                        "/tarifas/ajuste").hasAuthority("ADMIN")
+
+                // facturas/todas (ya lo tenías)
+                .requestMatchers(HttpMethod.GET,
+                        "/facturas/todas").hasAuthority("ADMIN")
+
+                // ====================
+                //     USER + ADMIN
+                // ====================
+
+                // g - Monopatines cercanos
+                .requestMatchers(HttpMethod.GET,
+                        "/monopatines/cercanos").hasAnyAuthority("USER","ADMIN")
+
+                // h - Uso de cuenta
+                .requestMatchers(HttpMethod.GET,
+                        "/usuarios/uso/**").hasAnyAuthority("USER","ADMIN")
+
+                // ====================
+                //     ANY LOGGED USER
+                // ====================
                 .anyRequest().authenticated()
         );
 
@@ -70,6 +115,3 @@ public class SecurityConfig {
         return config.getAuthenticationManager();
     }
 }
-
-
-

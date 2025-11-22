@@ -35,20 +35,19 @@ public class CuentaController {
         return service.actualizar(id, dto);
     }
 
-    @DeleteMapping("/borrar/{id}/{idAdmin}")
+    @DeleteMapping("/borrar/{id}")
     public void eliminar(@PathVariable Long id, @PathVariable Long idAdmin) {
         service.eliminar(id, idAdmin);
     }
 
-    @PutMapping("/{id}/anular/{idAdmin}")
-    public void anularCuenta(@PathVariable Long id, @PathVariable Long idAdmin) {
-        service.anularCuenta(id, idAdmin);
+    @PutMapping("/{id}/anular")
+    public void anularCuenta(@PathVariable Long id) {
+        service.anularCuenta(id);
     }
 
-    @PutMapping("/{id}/activar/{idAmin}")
-    public void activarCuenta(@PathVariable Long id
-    , @PathVariable Long idAmin) {
-        service.activarCuenta(id, idAmin);
+    @PutMapping("/{id}/activar")
+    public void activarCuenta(@PathVariable Long id) {
+        service.activarCuenta(id);
     }
 
     @PostMapping("/{idCuenta}/asociar-usuario/{idUsuario}")

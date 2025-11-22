@@ -80,25 +80,14 @@ public class CuentaService {
 
     // 🚫 Anular cuenta → escritura
     @Transactional(readOnly = false)
-    public void anularCuenta(Long id, Long idAdmin) {
-        Usuario admin = usuarioRepo.findById(idAdmin)
-                .orElseThrow(() -> new RuntimeException("Usuario administrador no encontrado"));
-
-        if (admin.getRol() != Rol.ADMIN) {
-            throw new RuntimeException("El usuario no tiene permisos de administrador");
-        }
+    public void anularCuenta(Long id) {
         repo.anularCuenta(id);
     }
 
     // ✅ Activar cuenta → escritura
     @Transactional(readOnly = false)
-    public void activarCuenta(Long id, Long idAdmin) {
-        Usuario admin = usuarioRepo.findById(idAdmin)
-                .orElseThrow(() -> new RuntimeException("Usuario administrador no encontrado"));
+    public void activarCuenta(Long id) {
 
-        if (admin.getRol() != Rol.ADMIN) {
-            throw new RuntimeException("El usuario no tiene permisos de administrador");
-        }
         repo.activarCuenta(id);
     }
 

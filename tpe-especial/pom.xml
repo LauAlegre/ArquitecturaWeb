@@ -55,7 +55,7 @@
 		<module>microservicio-viajes</module>
 		<module>microservicio-mantenimiento</module>
 		<module>microservicio-facturacion</module>
-		<module>seguridad</module>
+		<module>gateway</module>
 
 
 

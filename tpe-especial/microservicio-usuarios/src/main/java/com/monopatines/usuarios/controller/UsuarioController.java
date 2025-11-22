@@ -43,7 +43,7 @@ public class UsuarioController {
         service.eliminar(id, idAdmin);
     }
 
-    @GetMapping("/{id}/uso/{idUsuario}")
+    @GetMapping("/uso/{id}")
     public UsoCuentaDTO obtenerUso(@PathVariable Long id,
                                    @RequestParam LocalDate desde,
                                    @RequestParam LocalDate hasta,
