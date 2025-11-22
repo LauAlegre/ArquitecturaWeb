@@ -69,12 +69,7 @@ public class CuentaService {
 
     // 🗑️ Eliminar cuenta → escritura
     @Transactional(readOnly = false)
-    public void eliminar(Long id, Long idAdmin) {
-        Usuario admin = usuarioRepo.findById(idAdmin)
-                .orElseThrow(() -> new RuntimeException("Usuario administrador no encontrado"));
-        if (admin.getRol() != Rol.ADMIN) {
-            throw new RuntimeException("El usuario no tiene permisos de administrador");
-        }
+    public void eliminar(Long id) {
         repo.deleteById(id);
     }
 

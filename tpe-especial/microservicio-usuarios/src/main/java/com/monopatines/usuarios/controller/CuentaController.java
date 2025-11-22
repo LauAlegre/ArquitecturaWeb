@@ -36,8 +36,8 @@ public class CuentaController {
     }
 
     @DeleteMapping("/borrar/{id}")
-    public void eliminar(@PathVariable Long id, @PathVariable Long idAdmin) {
-        service.eliminar(id, idAdmin);
+    public void eliminar(@PathVariable Long id) {
+        service.eliminar(id);
     }
 
     @PutMapping("/{id}/anular")

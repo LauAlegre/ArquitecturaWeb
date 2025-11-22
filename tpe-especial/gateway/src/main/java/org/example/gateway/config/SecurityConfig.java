@@ -44,7 +44,7 @@ public class SecurityConfig {
                 //     ADMIN ONLY
                 // ====================
 
-                // a - Reporte KM con o sin pausas // acomodar endpoint
+                // a - Reporte KM con o sin pausas  (acomodar endpoint)
                 .requestMatchers(HttpMethod.GET,
                         "/monopatines/reporte/km").hasAuthority("ADMIN")
 
@@ -52,7 +52,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.PUT,
                         "/cuentas/*/anular").hasAuthority("ADMIN")
 
-                // c - Monopatines más viajes acomodar endpoint
+                // c - Monopatines más viajes (acomodar endpoint)
                 .requestMatchers(HttpMethod.GET,
                         "/api/v1/viajes/reporte/monopatines-mas-viajes")
                 .hasAuthority("ADMIN")
@@ -61,7 +61,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET,
                         "/facturas/total").hasAuthority("ADMIN")
 
-                // e - Ranking usuarios por tipo acomodar endpoint
+                // e - Ranking usuarios por tipo (acomodar endpoint)
                 .requestMatchers(HttpMethod.GET,
                         "/api/v1/viajes/uso-usuarios-por-tipo").hasAuthority("ADMIN")
 
