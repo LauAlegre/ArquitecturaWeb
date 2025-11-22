@@ -26,9 +26,9 @@ public class ParadaController {
         return service.buscarPorId(id);
     }
 
-    @PostMapping("/crear/{idAdmin}")
-    public ParadaDTO crear(@RequestBody ParadaDTO dto, @PathVariable Long idAdmin) {
-        return service.crear(dto, idAdmin);
+    @PostMapping("/crear")
+    public ParadaDTO crear(@RequestBody ParadaDTO dto) {
+        return service.crear(dto);
     }
 
     @PutMapping("/{id}")
@@ -36,8 +36,8 @@ public class ParadaController {
         return service.actualizar(id, dto);
     }
 
-    @DeleteMapping("/borrar/{idAdmin}")
-    public void eliminar(@PathVariable Long id, @PathVariable Long idAdmin) {
-        service.eliminar(id, idAdmin);
+    @DeleteMapping("/borrar")
+    public void eliminar(@PathVariable Long id) {
+        service.eliminar(id);
     }
 }

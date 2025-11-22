@@ -215,14 +215,7 @@ public class ViajeService {
 
     @Transactional(readOnly = true)
     public List<MonopatinViajesCountDTO> monopatinesConMasDeXViajes(int anio,
-                                                                    long minViajes,
-                                                                    Long usuarioAdminId) {
-        // Validación de admin
-        if (usuarioAdminId == null || !usuarioClient.esAdmin(usuarioAdminId)) {
-            throw new SecurityException("Acceso denegado: se requiere usuario admin.");
-        }
-
-        // Llamada al repository de MongoDB (aggregation)
+                                                                    long minViajes) {
         return viajeRepository.findMonopatinesConMasViajesMongo(anio, minViajes);
     }
 
@@ -230,30 +223,18 @@ public class ViajeService {
     public List<UsoUsuarioDTO> usuariosMasActivosPorTipo(LocalDate desde,
                                                          LocalDate hasta,
                                                          String tipoUsuario,
-                                                         Long usuarioAdminId,
                                                          int limite) {
         if (desde.isAfter(hasta)) {
             throw new IllegalArgumentException("El parámetro 'desde' no puede ser posterior a 'hasta'.");
         }
-
-        // Validar admin
-        if (usuarioAdminId == null || !usuarioClient.esAdmin(usuarioAdminId)) {
-            throw new SecurityException("Acceso denegado: se requiere usuario admin.");
-        }
-
-        // Obtener ids de usuarios del tipo desde el microservicio de usuarios
         List<Long> usuarioIdsDelTipo = usuarioClient.obtenerIdsUsuariosPorTipo(tipoUsuario);
         if (usuarioIdsDelTipo == null || usuarioIdsDelTipo.isEmpty()) {
-            return List.of(); // No hay usuarios del tipo => no hay ranking
+            return List.of();
         }
-
         LocalDateTime inicio = desde.atStartOfDay();
         LocalDateTime fin = hasta.plusDays(1).atStartOfDay();
-
-        // Ahora el repository de Mongo devuelve directamente DTOs
         List<UsoUsuarioDTO> lista =
                 viajeRepository.findUsoUsuariosPeriodoPorIds(inicio, fin, usuarioIdsDelTipo);
-
         if (limite > 0 && lista.size() > limite) {
             return lista.subList(0, limite);
         }

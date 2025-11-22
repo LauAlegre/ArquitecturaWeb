@@ -1,6 +1,5 @@
 package org.example.microserviciomonopatines.service.impl;
 
-import org.example.microserviciomonopatines.client.UsuarioClientMonopatines;
 import org.example.microserviciomonopatines.dto.MonopatinDTO;
 import org.example.microserviciomonopatines.dto.MonopatinReporteDTO;
 import org.example.microserviciomonopatines.model.EstadoMonopatin;
@@ -22,14 +21,12 @@ public class MonopatinServiceImpl implements MonopatinService {
     private final MonopatinRepository repository;
     private final GeoService geoService;
     private final MonopatinMapper mapper;
-    private final UsuarioClientMonopatines usuarioClient;
 
     public MonopatinServiceImpl(MonopatinRepository repository, GeoService geoService,
-                                MonopatinMapper mapper, UsuarioClientMonopatines usuarioClient) {
+                                MonopatinMapper mapper) {
         this.repository = repository;
         this.geoService = geoService;
         this.mapper = mapper;
-        this.usuarioClient = usuarioClient;
     }
 
     // ------------------------------ LECTURAS ---------------------------------
@@ -72,11 +69,7 @@ public class MonopatinServiceImpl implements MonopatinService {
     }
 
     @Override
-    public List<MonopatinReporteDTO> generarReporteKm(Boolean incluirPausas, Long usuarioId) {
-        Boolean esAdmin = usuarioClient.esAdmin(usuarioId);
-        if (esAdmin == null || !esAdmin)
-            throw new RuntimeException("Usuario no autorizado");
-
+    public List<MonopatinReporteDTO> generarReporteKm(Boolean incluirPausas) {
         return incluirPausas == null
                 ? repository.generarReporteKm()
                 : repository.generarReporteKm(incluirPausas);
@@ -86,10 +79,7 @@ public class MonopatinServiceImpl implements MonopatinService {
 
     @Override
     @Transactional(readOnly = false)
-    public MonopatinDTO crear(MonopatinDTO dto, Long idAdmin) {
-        if (!usuarioClient.esAdmin(idAdmin)) {
-            throw new IllegalArgumentException("El usuario no es administrador");
-        }
+    public MonopatinDTO crear(MonopatinDTO dto) {
         Monopatin monopatin = mapper.toEntity(dto);
         Monopatin guardado = repository.save(monopatin);
         return mapper.toDTO(guardado);
@@ -113,10 +103,7 @@ public class MonopatinServiceImpl implements MonopatinService {
 
     @Override
     @Transactional(readOnly = false)
-    public void eliminar(Long id,Long idAdmin) {
-        if (!usuarioClient.esAdmin(idAdmin)) {
-            throw new IllegalArgumentException("El usuario no es administrador");
-        }
+    public void eliminar(Long id) {
         repository.deleteById(id);
     }
 

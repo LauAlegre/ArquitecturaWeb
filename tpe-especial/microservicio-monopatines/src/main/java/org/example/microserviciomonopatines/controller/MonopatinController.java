@@ -26,9 +26,9 @@ public class MonopatinController {
         return service.buscarPorId(id);
     }
 
-    @PostMapping("/crear/{idAdmin}")
-    public MonopatinDTO crear(@RequestBody MonopatinDTO dto, @PathVariable Long idAdmin) {
-        return service.crear(dto, idAdmin);
+    @PostMapping("/crear")
+    public MonopatinDTO crear(@RequestBody MonopatinDTO dto) {
+        return service.crear(dto);
     }
 
     @PutMapping("/{id}")
@@ -36,9 +36,9 @@ public class MonopatinController {
         return service.actualizar(id, dto);
     }
 
-    @DeleteMapping("/borrar/{id}/{idAdmin}")
-    public void eliminar(@PathVariable Long id, @PathVariable Long idAdmin) {
-        service.eliminar(id, idAdmin);
+    @DeleteMapping("/borrar")
+    public void eliminar(@PathVariable Long id) {
+        service.eliminar(id);
     }
 
     // --- Operaciones adicionales específicas del dominio ---
@@ -77,9 +77,7 @@ public class MonopatinController {
     }
 
     @GetMapping("/reporte/km")
-    public List<MonopatinReporteDTO> generarReporteKm(@RequestParam(defaultValue = "false") boolean incluirPausas,
-            @RequestParam("usuarioId") Long usuarioId) {
-        return service.generarReporteKm(incluirPausas, usuarioId);
+    public List<MonopatinReporteDTO> generarReporteKm(@RequestParam(defaultValue = "false") boolean incluirPausas) {
+        return service.generarReporteKm(incluirPausas);
     }
-
 }

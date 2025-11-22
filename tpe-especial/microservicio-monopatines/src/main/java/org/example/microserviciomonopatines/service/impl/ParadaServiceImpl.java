@@ -1,6 +1,5 @@
 package org.example.microserviciomonopatines.service.impl;
 
-import org.example.microserviciomonopatines.client.UsuarioClientMonopatines;
 import org.example.microserviciomonopatines.dto.ParadaDTO;
 import org.example.microserviciomonopatines.model.Parada;
 import org.example.microserviciomonopatines.repository.ParadaRepository;
@@ -18,12 +17,10 @@ public class ParadaServiceImpl implements ParadaService {
 
     private final ParadaRepository repository;
     private final ParadaMapper mapper;
-    private final UsuarioClientMonopatines usuarioClient;
 
-    public ParadaServiceImpl(ParadaRepository repository, ParadaMapper mapper, UsuarioClientMonopatines usuarioClient) {
+    public ParadaServiceImpl(ParadaRepository repository, ParadaMapper mapper) {
         this.repository = repository;
         this.mapper = mapper;
-        this.usuarioClient = usuarioClient;
     }
 
     @Override
@@ -43,10 +40,7 @@ public class ParadaServiceImpl implements ParadaService {
 
     @Override
     @Transactional(readOnly = false)
-    public ParadaDTO crear(ParadaDTO dto,Long idAdmin) {
-        if (!usuarioClient.esAdmin(idAdmin)) {
-            throw new IllegalArgumentException("El usuario no es administrador");
-        }
+    public ParadaDTO crear(ParadaDTO dto) {
         Parada parada = mapper.toEntity(dto);
         return mapper.toDTO(repository.save(parada));
     }
@@ -67,10 +61,7 @@ public class ParadaServiceImpl implements ParadaService {
 
     @Override
     @Transactional(readOnly = false)
-    public void eliminar(Long id, Long idAdmin) {
-        if (!usuarioClient.esAdmin(idAdmin)) {
-            throw new IllegalArgumentException("El usuario no es administrador");
-        }
+    public void eliminar(Long id) {
         repository.deleteById(id);
     }
 }

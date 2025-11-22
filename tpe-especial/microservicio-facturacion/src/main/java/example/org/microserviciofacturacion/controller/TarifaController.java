@@ -31,9 +31,9 @@ public class TarifaController {
 
     // POST /tarifas/ajuste
     // Crea una nueva tarifa con fecha de inicio de vigencia
-    @PostMapping("/ajuste/{id}")
-    public Tarifa crearAjuste(@RequestBody TarifaDto dto, @PathVariable Long id) {
-        return tarifaService.crearAjuste(dto, id);
+    @PostMapping("/ajuste")
+    public Tarifa crearAjuste(@RequestBody TarifaDto dto) {
+        return tarifaService.crearAjuste(dto);
     }
 
     // GET /tarifas/historial

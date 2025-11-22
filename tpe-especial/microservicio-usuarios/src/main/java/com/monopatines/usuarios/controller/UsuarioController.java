@@ -50,11 +50,6 @@ public class UsuarioController {
                                    @RequestParam(defaultValue = "false") boolean incluirRelacionados) {
         return service.obtenerUso(id, desde, hasta, incluirRelacionados);
     }
-    // ✅ Nuevo endpoint: verificar si un usuario es admin
-    @GetMapping("/{id}/es-admin")
-    public boolean esAdmin(@PathVariable Long id) {
-        return service.esAdmin(id);
-    }
 
     @GetMapping("/por-tipo-cuenta")
     public List<Long> obtenerUsuariosPorTipoCuenta(@RequestParam String tipoCuenta) {

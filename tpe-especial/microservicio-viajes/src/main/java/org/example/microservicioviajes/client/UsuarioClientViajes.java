@@ -15,20 +15,6 @@ public class UsuarioClientViajes {
         this.restTemplate = restTemplate;
     }
 
-    // Consulta si un usuario es admin en el microservicio de usuarios.
-    public Boolean esAdmin(Long idUsuario) {
-        if (idUsuario == null) {
-            return false;
-        }
-        String url = UriComponentsBuilder
-                .fromHttpUrl("http://localhost:8080/usuarios/{id}/es-admin")
-                .buildAndExpand(idUsuario)
-                .toUriString();
-
-        Boolean resp = restTemplate.getForObject(url, Boolean.class);
-        return resp != null && resp;
-    }
-
     // Obtiene los IDs de cuentas/usuarios por tipo de cuenta desde el microservicio
     // de usuarios.
     public List<Long> obtenerIdsUsuariosPorTipo(String tipoCuenta) {

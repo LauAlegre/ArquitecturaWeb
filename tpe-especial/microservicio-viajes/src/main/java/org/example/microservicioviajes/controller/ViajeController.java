@@ -81,10 +81,8 @@ public class ViajeController {
 
     @GetMapping("/reporte/monopatines-mas-viajes")
     public List<MonopatinViajesCountDTO> monopatinesMasViajes(@RequestParam int anio,
-                                                              @RequestParam long minViajes,
-                                                              @RequestParam Long usuarioAdminId) {
-
-        return service.monopatinesConMasDeXViajes(anio, minViajes, usuarioAdminId);
+                                                              @RequestParam long minViajes) {
+        return service.monopatinesConMasDeXViajes(anio, minViajes);
     }
 
     @GetMapping("/uso-usuarios-por-tipo")
@@ -92,9 +90,8 @@ public class ViajeController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta,
             @RequestParam String tipoUsuario,
-            @RequestParam Long usuarioAdminId,
             @RequestParam(defaultValue = "0") int limite) {
 
-        return service.usuariosMasActivosPorTipo(desde, hasta, tipoUsuario, usuarioAdminId, limite);
+        return service.usuariosMasActivosPorTipo(desde, hasta, tipoUsuario, limite);
     }
 }

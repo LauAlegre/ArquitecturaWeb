@@ -136,12 +136,6 @@ public class UsuarioService {
         }
     }
 
-    public boolean esAdmin(Long idUsuario) {
-        Usuario usuario = repo.findById(idUsuario)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con id: " + idUsuario));
-        return usuario.getRol() == Rol.ADMIN;
-    }
-
     public List<Long> obtenerUsuariosPorTipoCuenta(String tipoCuenta) {
         return repo.findIdsByTipoCuenta(TipoCuenta.valueOf(tipoCuenta.toUpperCase()));
     }
