@@ -4,13 +4,15 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Data
 public class MonopatinReporteDTO {
+
     private Long id;
-    private double totalKm;
-    private long totalTiempoUso;          // tiempo total (con pausas)
-    private long totalTiempoUsoSinPausas; // tiempo solo de viajes
-    private boolean requiereMantenimiento;
+    private Double totalKm;
+    private Long totalTiempoUso;
+    private Boolean requiereMantenimiento;
+
 }
+

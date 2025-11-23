@@ -2,8 +2,9 @@ package org.example.microserviciomonopatines.service.impl;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import org.example.microservicioviajes.client.GroqClient;
-import org.example.microservicioviajes.dto.RespuestaApi;
+
+import org.example.microserviciomonopatines.client.GroqClient;
+import org.example.microserviciomonopatines.dto.RespuestaApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;

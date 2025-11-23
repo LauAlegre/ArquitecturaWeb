@@ -31,6 +31,7 @@ public class GroqClient {
             @Value("${groq.api-key}") String apiKey,
             @Value("${groq.model:llama-3.1-8b-instant}") String model
     ) {
+        System.out.println("API KEY RECIBIDA ---> " + apiKey);
         this.baseUrl = baseUrl;
         this.apiKey = apiKey;
         this.model = model;
