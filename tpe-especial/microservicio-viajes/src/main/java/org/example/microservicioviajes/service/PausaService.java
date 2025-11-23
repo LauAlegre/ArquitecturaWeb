@@ -1,5 +1,6 @@
 package org.example.microservicioviajes.service;
 
+import org.example.microservicioviajes.dto.MinutosPausaMonopatinDTO;
 import org.example.microservicioviajes.dto.PausaDTO;
 import org.example.microservicioviajes.mapper.PausaMapper;
 import org.example.microservicioviajes.model.PausaModel;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
@@ -43,6 +45,35 @@ public class PausaService {
 
         return pausaMapper.toDTO(pausa);
     }
+
+    public MinutosPausaMonopatinDTO obtenerMinutosPausaPorMonopatin(Long monopatinId) {
+        System.out.println("inicio");
+        // Traigo todos los viajes de ese monopatín
+        List<ViajeModel> viajes = viajeRepository.findByMonopatinId(monopatinId);
+
+        long totalMinutos = 0L;
+        int cantidadPausas = 0;
+
+        for (ViajeModel viaje : viajes) {
+            if (viaje.getPausas() == null) {
+                continue;
+            }
+
+            for (PausaModel pausa : viaje.getPausas()) {
+                if (pausa != null && pausa.getDuracionMinutos() != null) {
+                    totalMinutos += pausa.getDuracionMinutos();
+                    cantidadPausas++;
+                }
+            }
+        }
+        System.out.println("fin");
+        return new MinutosPausaMonopatinDTO(
+                monopatinId,
+                totalMinutos
+
+        );
+    }
+
 
 
     // ------------------------------------

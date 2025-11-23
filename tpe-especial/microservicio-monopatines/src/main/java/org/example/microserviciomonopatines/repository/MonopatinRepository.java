@@ -23,28 +23,21 @@ public interface MonopatinRepository extends JpaRepository<Monopatin, Long> {
             ")) <= :radio", nativeQuery = true)
     List<Monopatin> findWithinRadius(@Param("lat") double lat, @Param("lon") double lon, @Param("radio") double radio);
 
-    // Proyección/DTO para reporte (sin COALESCE ni CASE WHEN)
-    @Query("SELECT new org.example.microserviciomonopatines.dto.MonopatinReporteDTO( " +
-            "  m.id, " +
-            "  (CASE WHEN m.totalKm IS NULL THEN 0.0 ELSE m.totalKm END), " +
-            "  (CASE WHEN m.totalTiempoUso IS NULL THEN 0L ELSE m.totalTiempoUso END), " +
-            "  (CASE WHEN ( (m.totalKm IS NOT NULL AND m.totalKm >= 1000.0) OR " +
-            "               (m.totalTiempoUso IS NOT NULL AND m.totalTiempoUso >= 500L) ) " +
-            "        THEN true ELSE false END) " +
-            ") FROM Monopatin m")
-    List<MonopatinReporteDTO> generarReporteKm();
 
-    @Query("SELECT new org.example.microserviciomonopatines.dto.MonopatinReporteDTO( " +
-            "  m.id, " +
-            "  (CASE WHEN m.totalKm IS NULL THEN 0.0 ELSE m.totalKm END), " +
-            "  (CASE WHEN :incluirPausas = true THEN (CASE WHEN m.totalTiempoUso IS NULL THEN 0L ELSE m.totalTiempoUso END) ELSE 0L END), "
-            +
-            "  (CASE WHEN ( (m.totalKm IS NOT NULL AND m.totalKm >= 1000.0) OR " +
-            "               ( (CASE WHEN :incluirPausas = true THEN (CASE WHEN m.totalTiempoUso IS NULL THEN 0L ELSE m.totalTiempoUso END) ELSE 0L END) >= 500L ) ) "
-            +
-            "        THEN true ELSE false END) " +
-            ") FROM Monopatin m")
-    List<MonopatinReporteDTO> generarReporteKm(@Param("incluirPausas") boolean incluirPausas);
+    @Query("""
+       SELECT new org.example.microserviciomonopatines.dto.MonopatinReporteDTO(
+           m.id,
+           m.totalKm,
+           m.totalTiempoUso,
+           CASE 
+               WHEN m.totalKm < 1500 THEN false
+               ELSE true
+           END
+       )
+       FROM Monopatin m
+       ORDER BY m.totalKm DESC
+       """)
+    List<MonopatinReporteDTO> generarReporteKm();
 
 
 

@@ -1,7 +1,9 @@
 package org.example.microserviciomonopatines.service.impl;
 
+import org.example.microserviciomonopatines.client.PausaClientMonopatines;
 import org.example.microserviciomonopatines.dto.MonopatinDTO;
 import org.example.microserviciomonopatines.dto.MonopatinReporteDTO;
+import org.example.microserviciomonopatines.dto.PausaMonopatinDTO;
 import org.example.microserviciomonopatines.model.EstadoMonopatin;
 import org.example.microserviciomonopatines.repository.MonopatinRepository;
 import org.example.microserviciomonopatines.service.GeoService;
@@ -21,9 +23,11 @@ public class MonopatinServiceImpl implements MonopatinService {
     private final MonopatinRepository repository;
     private final GeoService geoService;
     private final MonopatinMapper mapper;
+    private final PausaClientMonopatines pausaClient;
 
     public MonopatinServiceImpl(MonopatinRepository repository, GeoService geoService,
-                                MonopatinMapper mapper) {
+                                MonopatinMapper mapper, PausaClientMonopatines pausaClient) {
+        this.pausaClient = pausaClient;
         this.repository = repository;
         this.geoService = geoService;
         this.mapper = mapper;
@@ -70,9 +74,18 @@ public class MonopatinServiceImpl implements MonopatinService {
 
     @Override
     public List<MonopatinReporteDTO> generarReporteKm(Boolean incluirPausas) {
-        return incluirPausas == null
-                ? repository.generarReporteKm()
-                : repository.generarReporteKm(incluirPausas);
+        if(incluirPausas)
+        {
+            List<MonopatinReporteDTO> reporteKm = repository.generarReporteKm();
+            for(MonopatinReporteDTO a : reporteKm )
+            {
+                PausaMonopatinDTO minutosPausa = pausaClient.obtenerPausasDeMonopatin(a.getId());
+                a.setTotalTiempoUso(a.getTotalTiempoUso() + minutosPausa.getTotalMinutosPausa());
+
+            }
+            return  reporteKm;
+        }
+        return  repository.generarReporteKm();
     }
 
     // ------------------------------ ESCRITURAS ---------------------------------

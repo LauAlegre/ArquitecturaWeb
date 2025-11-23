@@ -33,7 +33,7 @@ public class UsuarioController {
         return service.crear(dto, idAdmin);
     }
 
-    @PutMapping("/{id   }")
+    @PutMapping("/{id}")
     public UsuarioDTO actualizar(@PathVariable Long id, @RequestBody UsuarioDTO dto) {
         return service.actualizar(id, dto);
     }
