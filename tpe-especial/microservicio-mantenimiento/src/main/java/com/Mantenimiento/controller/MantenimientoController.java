@@ -49,9 +49,8 @@ public class MantenimientoController {
     // PUT /mantenimientos/{id}/finalizar  -> finalizar
     @PutMapping("/{id}/finalizar")
     public MantenimientoDTO finalizar(@PathVariable Long id,
-                                      @RequestParam String observaciones,
-                                      @RequestParam(required = false) Long paradaId) {
-        return service.finalizar(id, observaciones, paradaId);
+                                      @RequestParam String observaciones){
+        return service.finalizar(id, observaciones);
     }
 
     // GET /mantenimientos/activos  -> solo activos

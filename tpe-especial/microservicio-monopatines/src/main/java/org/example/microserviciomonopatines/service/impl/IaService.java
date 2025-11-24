@@ -3,6 +3,7 @@ package org.example.microserviciomonopatines.service.impl;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 
+import org.example.microserviciomonopatines.client.CuentasClient;
 import org.example.microserviciomonopatines.client.GroqClient;
 import org.example.microserviciomonopatines.dto.RespuestaApi;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +11,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-// [MOD] → para permitir DML dentro de una transacción
+
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.InputStream;
@@ -22,127 +23,101 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * 👉 Servicio que:
- * - Construye el prompt con el esquema SQL
- * - Llama a Groq para generar SQL
- * - Valida y extrae una ÚNICA sentencia SQL (SELECT/INSERT/UPDATE/DELETE)
- * - Ejecuta de forma segura (bloquea DDL peligrosos)
- */
 @Service
 public class IaService {
 
     @PersistenceContext
     private EntityManager entityManager;
 
-    @Autowired
-    private GroqClient groqChatClient;
-
+    private final CuentasClient cuentasClient;
+    private final GroqClient groqChatClient;
     private final String CONTEXTO_SQL;
 
     private static final Logger log = LoggerFactory.getLogger(IaService.class);
 
-    // ========================================================================
-    // [MOD - NUEVO] Reglas de extracción/seguridad para la sentencia SQL
-    // ------------------------------------------------------------------------
-    // Aceptamos EXACTAMENTE una sentencia que empiece por SELECT|INSERT|UPDATE|DELETE
-    // y que termine en ';'. El DOTALL permite capturar saltos de línea.
+    // Patrón para aceptar SOLO SELECT/INSERT/UPDATE/DELETE
     private static final Pattern SQL_ALLOWED =
             Pattern.compile("(?is)\\b(SELECT|INSERT|UPDATE|DELETE)\\b[\\s\\S]*?;");
 
-    // Bloqueamos DDL u otras operaciones peligrosas por si el modelo "derrapa".
+    // Bloquear comandos peligrosos
     private static final Pattern SQL_FORBIDDEN =
             Pattern.compile("(?i)\\b(DROP|TRUNCATE|ALTER|CREATE|GRANT|REVOKE)\\b");
-    // ========================================================================
 
-    public IaService() {
+    @Autowired
+    public IaService(CuentasClient cuentasClient, GroqClient groqChatClient) {
+        this.cuentasClient = cuentasClient;
+        this.groqChatClient = groqChatClient;
         this.CONTEXTO_SQL = cargarEsquemaSQL("esquema_completo.sql");
     }
 
-    private String cargarEsquemaSQL(String nombreArchivo) {
-        try (InputStream inputStream = new ClassPathResource(nombreArchivo).getInputStream()) {
+    private String cargarEsquemaSQL(String archivo) {
+        try (InputStream inputStream = new ClassPathResource(archivo).getInputStream()) {
             return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
         } catch (Exception e) {
-            throw new RuntimeException("Error al leer el archivo SQL desde resources: " + e.getMessage(), e);
+            throw new RuntimeException("Error al leer esquema SQL: " + e.getMessage(), e);
         }
     }
 
-    /**
-     * Genera el prompt, obtiene la SQL de Groq, la valida y ejecuta.
-     */
-    // ========================================================================
-    // [MOD - NUEVO] Agregamos @Transactional para soportar INSERT/UPDATE/DELETE
-    // ========================================================================
     @Transactional
-    public ResponseEntity<?> procesarPrompt(String promptUsuario) {
+    public ResponseEntity<?> procesarPrompt(String promptUsuario, Long idCuenta) {
+
+        // 🟣 VALIDACIÓN PREMIUM
+        if (!cuentasClient.esPremium(idCuenta)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(new RespuestaApi<>(false,
+                            "Solo usuarios PREMIUM pueden usar el chatbot.", null));
+        }
+
         try {
+            // 🟦 Construcción del prompt
             String promptFinal = """
                     Este es el esquema de mi base de datos MySQL:
                     %s
 
-                    Basándote exclusivamente en este esquema, devolveme ÚNICAMENTE una sentencia SQL
-                    MySQL completa y VÁLIDA (sin texto adicional, sin markdown, sin comentarios) que
-                    termine con punto y coma. La sentencia puede ser SELECT/INSERT/UPDATE/DELETE.
+                    Basándote exclusivamente en este esquema, devolvé UNA sentencia SQL válida
+                    (SELECT/INSERT/UPDATE/DELETE), sin texto adicional.
+
                     %s
                     """.formatted(CONTEXTO_SQL, promptUsuario);
 
-            log.info("==== PROMPT ENVIADO A LA IA ====\n{}", promptFinal);
+            log.info("PROMPT ---> \n{}", promptFinal);
 
+            // 🧠 Llamada al modelo Groq
             String respuestaIa = groqChatClient.preguntar(promptFinal);
-            log.info("==== RESPUESTA IA ====\n{}", respuestaIa);
+            log.info("RESPUESTA GROQ ---> \n{}", respuestaIa);
 
-            // ========================================================================
-            // [MOD - CAMBIO] Usamos la nueva extracción segura (acepta DML y bloquea DDL)
-            // ========================================================================
+            // 🟡 Extraer SQL
             String sql = extraerConsultaSQL(respuestaIa);
             if (sql == null || sql.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                return ResponseEntity.badRequest()
                         .body(new RespuestaApi<>(false,
-                                "No se encontró una sentencia SQL válida en la respuesta de la IA.", null));
+                                "No se encontró SQL válida en la respuesta.", null));
             }
 
-            log.info("==== SQL EXTRAÍDA ====\n{}", sql);
+            log.info("SQL EXTRAÍDA ---> {}", sql);
 
-            // Para JDBC/JPA normalmente NO va el ';' final
-            String sqlToExecute = sql.endsWith(";") ? sql.substring(0, sql.length() - 1) : sql;
+            // Quitar el ";"
+            String sqlExec = sql.endsWith(";") ? sql.substring(0, sql.length() - 1) : sql;
 
-            try {
-                Object data;
-                // ====================================================================
-                // [MOD - NUEVO] Ejecutamos SELECT con getResultList y DML con executeUpdate
-                // ====================================================================
-                if (sql.trim().regionMatches(true, 0, "SELECT", 0, 6)) {
-                    @SuppressWarnings("unchecked")
-                    List<Object[]> resultados = entityManager.createNativeQuery(sqlToExecute).getResultList();
-                    data = resultados;
-                    return ResponseEntity.ok(new RespuestaApi<>(true, "Consulta SELECT ejecutada con éxito", data));
-                } else {
-                    int rows = entityManager.createNativeQuery(sqlToExecute).executeUpdate();
-                    data = rows; // cantidad de filas afectadas
-                    return ResponseEntity.ok(new RespuestaApi<>(true, "Sentencia DML ejecutada con éxito", data));
-                }
-            } catch (Exception e) {
-                log.warn("Error al ejecutar SQL: {}", e.getMessage(), e);
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body(new RespuestaApi<>(false, "Error al ejecutar la sentencia: " + e.getMessage(), null));
+            // 🟢 Ejecutar según tipo
+            if (sqlExec.toUpperCase().startsWith("SELECT")) {
+                List<Object[]> filas =
+                        entityManager.createNativeQuery(sqlExec).getResultList();
+                return ResponseEntity.ok(new RespuestaApi<>(true, "SELECT OK", filas));
+
+            } else {
+                int filas = entityManager.createNativeQuery(sqlExec).executeUpdate();
+                return ResponseEntity.ok(new RespuestaApi<>(true, "DML OK", filas));
             }
 
         } catch (Exception e) {
-            log.error("Fallo al procesar prompt", e);
-            return new ResponseEntity<>(
-                    new RespuestaApi<>(false, "Error al procesar el prompt: " + e.getMessage(), null),
-                    HttpStatus.INTERNAL_SERVER_ERROR
-            );
+            log.error("Error procesando prompt", e);
+            return ResponseEntity.internalServerError()
+                    .body(new RespuestaApi<>(false, e.getMessage(), null));
         }
     }
 
-    // ========================================================================
-    // [MOD - REEMPLAZO] Método de extracción robusto y documentado
-    //   - Acepta SOLO una sentencia que empiece con SELECT/INSERT/UPDATE/DELETE
-    //   - Exige punto y coma final
-    //   - Recorta todo lo que venga después del primer ';'
-    //   - Bloquea DDL peligrosos (DROP/TRUNCATE/ALTER/CREATE/GRANT/REVOKE)
-    // ========================================================================
+    // 🟥 Extractor seguro de SQL
     private String extraerConsultaSQL(String respuesta) {
         if (respuesta == null) return null;
 
@@ -151,34 +126,15 @@ public class IaService {
 
         String sql = m.group().trim();
 
-        // Asegurar UNA sola sentencia (hasta el primer ';')
-        int first = sql.indexOf(';');
-        if (first > -1) {
-            sql = sql.substring(0, first + 1);
+        int pos = sql.indexOf(';');
+        if (pos > -1) {
+            sql = sql.substring(0, pos + 1);
         }
 
-        // Bloquear DDL
         if (SQL_FORBIDDEN.matcher(sql).find()) {
-            log.warn("Sentencia bloqueada por contener DDL prohibido: {}", sql);
             return null;
         }
 
         return sql;
     }
-
-    // =======================
-    // [MOD - HISTÓRICO]
-    // Antes estaba este extraerConsultaSQL que solo acepta consultas SELECT:
-    //
-    // private String extraerConsultaSQL(String respuesta) {
-    //     Pattern pattern = Pattern.compile("(?i)(SELECT\\s+.*?;)", Pattern.DOTALL);
-    //     Matcher matcher = pattern.matcher(respuesta);
-    //     if (matcher.find()) {
-    //         return matcher.group(1).trim();
-    //     }
-    //     return null;
-    // }
-    //
-    // Lo reemplazamos por la versión superior que permite DML y agrega salvaguardas.
-    // =======================
 }

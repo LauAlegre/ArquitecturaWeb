@@ -5,7 +5,6 @@ import com.monopatines.usuarios.dto.UsoCuentaDTO;
 import com.monopatines.usuarios.dto.UsuarioDTO;
 import com.monopatines.usuarios.mapper.UsuarioMapper;
 import com.monopatines.usuarios.model.Cuenta;
-import com.monopatines.usuarios.model.Rol;
 import com.monopatines.usuarios.model.TipoCuenta;
 import com.monopatines.usuarios.model.Usuario;
 import com.monopatines.usuarios.repository.UsuarioRepository;
@@ -121,14 +120,7 @@ public class UsuarioService {
 
     // ---------------------- PERMISOS Y UTILITARIOS ----------------------
 
-    private void verificarPermisosAdmin(Long idSolicitante) {
-        Usuario solicitante = repo.findById(idSolicitante)
-                .orElseThrow(() -> new RuntimeException("Usuario solicitante no encontrado con id: " + idSolicitante));
 
-        if (solicitante.getRol() != Rol.ADMIN) {
-            throw new RuntimeException("No tiene permisos para ver el uso de otros usuarios");
-        }
-    }
 
     public List<Long> obtenerUsuariosPorTipoCuenta(String tipoCuenta) {
         return repo.findIdsByTipoCuenta(TipoCuenta.valueOf(tipoCuenta.toUpperCase()));

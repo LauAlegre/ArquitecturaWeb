@@ -3,7 +3,6 @@ package com.monopatines.usuarios.service;
 import com.monopatines.usuarios.dto.CuentaDTO;
 import com.monopatines.usuarios.mapper.CuentaMapper;
 import com.monopatines.usuarios.model.Cuenta;
-import com.monopatines.usuarios.model.Rol;
 import com.monopatines.usuarios.model.Usuario;
 import com.monopatines.usuarios.repository.CuentaRepository;
 import com.monopatines.usuarios.repository.UsuarioRepository;
@@ -46,6 +45,9 @@ public class CuentaService {
     // ➕ Crear una cuenta nueva → modifica, necesita transacción de escritura
     @Transactional(readOnly = false)
     public CuentaDTO crear(CuentaDTO dto) {
+        dto.setFechaAlta(java.time.LocalDate.now());
+        dto.setActiva(true);
+        dto.setSaldo(0.0);
         Cuenta nueva = mapper.toEntity(dto);
         Cuenta guardada = repo.save(nueva);
         return mapper.toDTO(guardada);

@@ -9,27 +9,22 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/ia")
-public class IaController {    // IaController exponene el endpoint REST que recibe prompts y delega a IaService.
-
-
-    /**🔑 que va a hacer mi app en conjunto
-     *  IaController recibe prompt →
-     *  IaService añade esquema + manda a Ollama →
-     *  OllamaClient se conecta a la API →
-     *  Respuesta: IA devuelve consulta SQL →
-     *  IaService la ejecuta →
-     *  Respuesta JSON con resultados.
-     */
+public class IaController {
 
     @Autowired
     private IaService iaService;
 
-    @PostMapping(value = "/prompt", produces = "application/json") // 👉 Define endpoint POST /api/ia/prompt que recibe un prompt como cuerpo JSON.
-    public ResponseEntity<?> procesarPrompt(@RequestBody String prompt) {
+    @PostMapping(value = "/prompt", produces = "application/json")
+    public ResponseEntity<?> procesarPrompt(
+            @RequestHeader("X-Cuenta-Id") Long idCuenta,   // ✅ VIENE EN HEADERS
+            @RequestBody String prompt                    // ✅ BODY sigue como texto
+    ) {
         try {
-            return iaService.procesarPrompt(prompt);
+            return iaService.procesarPrompt(prompt, idCuenta);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al procesar el prompt: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al procesar el prompt: " + e.getMessage());
         }
     }
 }
+
