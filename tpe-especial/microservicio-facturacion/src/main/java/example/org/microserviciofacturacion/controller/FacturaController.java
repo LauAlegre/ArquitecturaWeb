@@ -6,10 +6,9 @@ import example.org.microserviciofacturacion.model.Factura;
 import example.org.microserviciofacturacion.service.FacturaService;
 import org.springframework.web.bind.annotation.*;
 
-@RestController // Indica que esta clase maneja peticiones HTTP (API REST)
-@RequestMapping("/facturas") // para los endpoints
+@RestController
+@RequestMapping("/facturas")
 public class FacturaController {
-
     private final FacturaService facturaService;
 
     // Inyección del servicio

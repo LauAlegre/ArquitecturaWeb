@@ -28,9 +28,9 @@ public class UsuarioController {
         return service.buscarPorId(id);
     }
 
-    @PostMapping("/crear/{idAdmin}")
-    public UsuarioDTO crear(@RequestBody UsuarioDTO dto, @PathVariable Long idAdmin) {
-        return service.crear(dto, idAdmin);
+    @PostMapping("/crear")
+    public UsuarioDTO crear(@RequestBody UsuarioDTO dto) {
+        return service.crear(dto);
     }
 
     @PutMapping("/{id}")
@@ -38,9 +38,9 @@ public class UsuarioController {
         return service.actualizar(id, dto);
     }
 
-    @DeleteMapping("/borrar/{id}/{idAdmin}")
-    public void eliminar(@PathVariable Long id,Long idAdmin) {
-        service.eliminar(id, idAdmin);
+    @DeleteMapping("/borrar/{id}")
+    public void eliminar(@PathVariable Long id) {
+        service.eliminar(id);
     }
 
     @GetMapping("/uso/{id}")

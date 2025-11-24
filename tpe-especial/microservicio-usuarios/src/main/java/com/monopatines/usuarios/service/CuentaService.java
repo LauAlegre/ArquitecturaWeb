@@ -45,12 +45,7 @@ public class CuentaService {
 
     // ➕ Crear una cuenta nueva → modifica, necesita transacción de escritura
     @Transactional(readOnly = false)
-    public CuentaDTO crear(CuentaDTO dto, Long idAdmin) {
-        Usuario admin = usuarioRepo.findById(idAdmin)
-                .orElseThrow(() -> new RuntimeException("Usuario administrador no encontrado"));
-        if (admin.getRol() != Rol.ADMIN) {
-            throw new RuntimeException("El usuario no tiene permisos de administrador");
-        }
+    public CuentaDTO crear(CuentaDTO dto) {
         Cuenta nueva = mapper.toEntity(dto);
         Cuenta guardada = repo.save(nueva);
         return mapper.toDTO(guardada);

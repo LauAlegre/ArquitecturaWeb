@@ -18,7 +18,7 @@ public class TarifaServiceImpl implements TarifaService {
     private final Tarifamapper tarifaMapper;
 
     public TarifaServiceImpl(TarifaRepository tarifaRepository,
-                              Tarifamapper tarifamapper) {            // 👈
+                              Tarifamapper tarifamapper) {
         this.tarifaRepository = tarifaRepository;
         this.tarifaMapper = tarifamapper;
     }
@@ -33,7 +33,6 @@ public class TarifaServiceImpl implements TarifaService {
     @Transactional
     @Override
     public Tarifa crearAjuste(TarifaDto dto) {
-
         if (dto.getFechaInicioVigencia() == null)
             throw new IllegalArgumentException("fechaInicioVigencia es obligatoria");
 
@@ -49,7 +48,6 @@ public class TarifaServiceImpl implements TarifaService {
             }
         });
 
-        // 👇 en vez de construirla “a mano”
         Tarifa nueva = tarifaMapper.toEntity(dto);
         return tarifaRepository.save(nueva);
     }
@@ -60,15 +58,13 @@ public class TarifaServiceImpl implements TarifaService {
                 .sorted(Comparator.comparing(Tarifa::getFechaInicioVigencia).reversed())
                 .toList();
     }
+
     @Override
     @Transactional(readOnly = false)
     public void eliminarTarifa(Long id) {
-
-
         Tarifa tarifa = tarifaRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("No existe la tarifa con id " + id));
 
         tarifaRepository.delete(tarifa);
     }
-
 }

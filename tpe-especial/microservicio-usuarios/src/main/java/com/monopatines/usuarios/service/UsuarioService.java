@@ -47,8 +47,7 @@ public class UsuarioService {
     }
 
     @Transactional(readOnly = false) // 🔹 Escritura → inicia transacción real
-    public UsuarioDTO crear(UsuarioDTO dto, Long idAdmin) {
-        verificarPermisosAdmin(idAdmin);
+    public UsuarioDTO crear(UsuarioDTO dto) {
         Usuario nuevo = mapper.toEntity(dto);
         Usuario guardado = repo.save(nuevo);
         return mapper.toDTO(guardado);
@@ -66,9 +65,7 @@ public class UsuarioService {
     }
 
     @Transactional(readOnly = false)
-    public void eliminar(Long id, Long idAdmin) {
-        verificarPermisosAdmin(idAdmin);
-
+    public void eliminar(Long id) {
         repo.deleteById(id);
     }
 
@@ -80,10 +77,7 @@ public class UsuarioService {
      * Si incluirRelacionados = false, solo los viajes del usuario específico.
      */
     public UsoCuentaDTO obtenerUso(Long idUsuario, LocalDate desde, LocalDate hasta, boolean incluirRelacionados) {
-
-
-
-        // 2️⃣ Buscar usuario objetivo
+        //  Buscar usuario objetivo
         Usuario usuario = repo.findById(idUsuario)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado con id: " + idUsuario));
 

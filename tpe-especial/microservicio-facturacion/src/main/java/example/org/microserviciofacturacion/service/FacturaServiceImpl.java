@@ -29,12 +29,10 @@ public class FacturaServiceImpl implements FacturaService {
         this.cuentaClient = cuentaClient;
     }
 
-
     @Override
     @Transactional
     public Factura generarFactura(DatosDeFacturacionDto dto) {
-
-        // 🔹 Validaciones
+        //  Validaciones
         if (dto.getIdCuenta() == null || dto.getIdViaje() == null)
             throw new IllegalArgumentException("idCuenta e idViaje son obligatorios");
         if (dto.getMinutosViaje() <= 0)
@@ -92,5 +90,4 @@ public class FacturaServiceImpl implements FacturaService {
     public Iterable<Factura> obtenerTodas() {
         return facturaRepository.findAll();
     }
-
 }

@@ -25,9 +25,9 @@ public class CuentaController {
         return service.buscarPorId(id);
     }
 
-    @PostMapping("/crear/{idAdmin}")
-    public CuentaDTO crear(@RequestBody CuentaDTO dto, @PathVariable Long idAdmin) {
-        return service.crear(dto, idAdmin);
+    @PostMapping("/crear")
+    public CuentaDTO crear(@RequestBody CuentaDTO dto) {
+        return service.crear(dto);
     }
 
     @PutMapping("/{id}")

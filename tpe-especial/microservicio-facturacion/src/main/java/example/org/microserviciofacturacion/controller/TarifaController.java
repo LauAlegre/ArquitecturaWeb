@@ -9,14 +9,12 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
 
-@RestController // Indica que esta clase expone una API REST
-@RequestMapping("/tarifas") // Prefijo común para todos los endpoints
+@RestController
+@RequestMapping("/tarifas")
 public class TarifaController {
 
     private final TarifaService tarifaService;
 
-
-    // Inyección del servicio de tarifas
     public TarifaController(TarifaService tarifaService) {
         this.tarifaService = tarifaService;
     }
