@@ -13,12 +13,10 @@ public class Carrera {
     private String nombre;
     @Column
     private int duracion_anios;
-    @OneToMany(mappedBy = "carrera", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "carrera")
     private List<Inscripcion> inscripciones;
 
     public void setId(Long id_carrera) {
         this.id_carrera = id_carrera;
     }
-
-
 }

@@ -14,7 +14,7 @@ public class Carrera {
     private String nombre;
     @Column
     private int duracion_anios;
-    @OneToMany (mappedBy = "carrera", fetch = javax.persistence.FetchType.LAZY)
+    @OneToMany(mappedBy = "carrera")
     private List<Inscripcion> inscripciones;
 
     // Getters y Setters
